@@ -29,7 +29,7 @@ HR-Mate/
 ├─ README.md
 ├─ CLAUDE.md            개발 지침
 ├─ docs/                요구사항, 진행 기록
-├─ backend/             Spring Boot 서버 (예정)
+├─ backend/             Spring Boot 서버 (DB 연결까지 구성)
 └─ frontend/            React 화면 (가짜 데이터로 동작 중)
 ```
 
@@ -55,9 +55,28 @@ npm run dev
 - 아직 백엔드·DB와 연결되지 않았습니다. `frontend/src/api/employeeApi.js`가 가짜 데이터(`frontend/src/mocks/mockEmployees.js`)로 동작합니다.
 - 새로고침하면 등록·수정한 내용이 초기화됩니다.
 
-### 백엔드
+### 백엔드 (현재: DB 연결까지 구성, API 없음)
 
-추후 작성 예정입니다.
+사전 준비: [docs/setup-database.md](docs/setup-database.md)대로 `hr_mate` DB와 `hrmate_app` 계정을 만듭니다.
+
+1. 로컬 설정 파일을 만듭니다. (처음 한 번)
+
+   ```powershell
+   cd C:\Users\ADMIN\Desktop\HR-Mate
+   Copy-Item backend\src\main\resources\application-local.yml.example backend\src\main\resources\application-local.yml
+   ```
+
+2. `application-local.yml`을 편집기로 열어 앱 계정 비밀번호를 직접 입력하고 저장합니다.
+   이 파일은 Git에서 제외됩니다. 비밀번호를 채팅이나 다른 파일에 적지 않습니다.
+
+3. 서버를 실행합니다.
+
+   ```powershell
+   cd C:\Users\ADMIN\Desktop\HR-Mate\backend
+   .\gradlew.bat bootRun
+   ```
+
+   로그에 `Started HrMateApplication`이 나오면 성공입니다. 종료는 `Ctrl + C`.
 
 ## 진행 상황
 

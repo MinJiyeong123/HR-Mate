@@ -1,0 +1,28 @@
+# HR Mate 백엔드 공통 설정
+# 비밀번호 등 민감정보는 이 파일에 넣지 않습니다.
+# 로컬 DB 비밀번호는 application-local.yml(Git 제외)에서 설정합니다.
+spring:
+  application:
+    name: hr-mate
+
+  profiles:
+    # 기본 실행 환경. application-local.yml 설정을 함께 읽습니다.
+    active: local
+
+  datasource:
+    url: jdbc:mariadb://localhost:3306/hr_mate
+    username: hrmate_app
+    # password: application-local.yml 에서 설정
+
+  jpa:
+    # 테이블은 Flyway(SQL 파일)로만 만들고, JPA는 엔티티와 테이블이 맞는지 검사만 합니다.
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+server:
+  port: 8080

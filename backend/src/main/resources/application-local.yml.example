@@ -1,0 +1,10 @@
+# 로컬 개발용 설정 예시 파일입니다. (Git에 포함됩니다. 실제 비밀번호를 넣지 마세요.)
+#
+# 사용 방법
+# 1. 이 파일을 같은 폴더에 application-local.yml 이름으로 복사합니다.
+# 2. 복사한 application-local.yml 에서 비밀번호 자리를 앱 계정(hrmate_app) 비밀번호로 바꿉니다.
+#    큰따옴표(")는 그대로 둡니다.
+# 3. application-local.yml 은 .gitignore 로 Git에서 제외되어 커밋되지 않습니다.
+spring:
+  datasource:
+    password: "여기에_앱_계정_비밀번호"
