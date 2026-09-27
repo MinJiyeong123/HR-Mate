@@ -1,0 +1,48 @@
+### 사원 API 수동 호출 예시 (명세: docs/api/employee-api.md)
+### VS Code "REST Client" 확장 또는 IntelliJ HTTP Client 에서 요청 위의 "Send Request"로 실행합니다.
+###
+### 주의: POST / PUT / DELETE 는 개발용 DB(hr_mate)에 실제로 반영되며 되돌려지지 않습니다.
+###       논리 삭제한 사원의 사번은 다시 쓸 수 없습니다. 가상 데이터만 사용하세요.
+
+@baseUrl = http://localhost:8080
+
+### [읽기] 사원 목록
+GET {{baseUrl}}/api/employees
+
+### [읽기] 사원 상세 (id는 내부 ID)
+GET {{baseUrl}}/api/employees/1
+
+### [읽기] 사번 중복 확인
+GET {{baseUrl}}/api/employees/employee-no/check?value=e2026001
+
+### [쓰기] 사원 등록 - DB에 실제로 저장됩니다
+POST {{baseUrl}}/api/employees
+Content-Type: application/json
+
+{
+  "employeeNo": "E2026001",
+  "name": "김가상",
+  "hireDate": "2026-03-02",
+  "department": "인사팀",
+  "position": "대리",
+  "phone": "010-0000-0001",
+  "email": "kim@example.com"
+}
+
+### [쓰기] 사원 수정 (퇴사 처리) - DB에 실제로 반영됩니다
+PUT {{baseUrl}}/api/employees/1
+Content-Type: application/json
+
+{
+  "name": "김가상",
+  "hireDate": "2026-03-02",
+  "department": "인사팀",
+  "position": "대리",
+  "phone": "010-0000-0001",
+  "email": "kim@example.com",
+  "employmentStatus": "RESIGNED",
+  "resignationDate": "2026-12-31"
+}
+
+### [쓰기] 사원 논리 삭제 - 되돌릴 수 없고 사번은 계속 사용 중으로 남습니다
+DELETE {{baseUrl}}/api/employees/1

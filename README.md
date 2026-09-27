@@ -29,7 +29,7 @@ HR-Mate/
 ├─ README.md
 ├─ CLAUDE.md            개발 지침
 ├─ docs/                요구사항, 진행 기록
-├─ backend/             Spring Boot 서버 (DB 연결까지 구성)
+├─ backend/             Spring Boot 서버 (사원 API)
 └─ frontend/            React 화면 (가짜 데이터로 동작 중)
 ```
 
@@ -55,7 +55,9 @@ npm run dev
 - 아직 백엔드·DB와 연결되지 않았습니다. `frontend/src/api/employeeApi.js`가 가짜 데이터(`frontend/src/mocks/mockEmployees.js`)로 동작합니다.
 - 새로고침하면 등록·수정한 내용이 초기화됩니다.
 
-### 백엔드 (현재: DB 연결까지 구성, API 없음)
+### 백엔드 (현재: 사원 API 구현, 프론트엔드와는 아직 미연결)
+
+API 명세: [docs/api/employee-api.md](docs/api/employee-api.md)
 
 사전 준비: [docs/setup-database.md](docs/setup-database.md)대로 `hr_mate` DB와 `hrmate_app` 계정을 만듭니다.
 
