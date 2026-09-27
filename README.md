@@ -30,12 +30,34 @@ HR-Mate/
 ├─ CLAUDE.md            개발 지침
 ├─ docs/                요구사항, 진행 기록
 ├─ backend/             Spring Boot 서버 (예정)
-└─ frontend/            React 화면 (예정)
+└─ frontend/            React 화면 (가짜 데이터로 동작 중)
 ```
 
 ## 실행 방법
 
-추후 작성 예정입니다. (백엔드·프론트엔드 구성 후 단계별로 추가)
+### 프론트엔드 (현재: 가짜 데이터로 동작)
+
+Windows PowerShell 기준입니다. 처음 한 번만 라이브러리를 설치합니다.
+
+```powershell
+cd C:\Users\ADMIN\Desktop\HR-Mate\frontend
+npm install
+```
+
+개발 서버 실행:
+
+```powershell
+npm run dev
+```
+
+브라우저에서 http://localhost:5173 을 엽니다. 종료는 터미널에서 `Ctrl + C`.
+
+- 아직 백엔드·DB와 연결되지 않았습니다. `frontend/src/api/employeeApi.js`가 가짜 데이터(`frontend/src/mocks/mockEmployees.js`)로 동작합니다.
+- 새로고침하면 등록·수정한 내용이 초기화됩니다.
+
+### 백엔드
+
+추후 작성 예정입니다.
 
 ## 진행 상황
 
