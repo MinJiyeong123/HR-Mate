@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(application-local.yml)",
+      "Edit(application-local.yml)",
+      "Read(.env)",
+      "Edit(.env)",
+      "Read(.env.*)",
+      "Edit(.env.*)"
+    ]
+  }
+}
