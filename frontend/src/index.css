@@ -625,6 +625,156 @@ a.sidebar__link:hover {
   padding: 18px 0 22px;
 }
 
+.table__link {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.table__link:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.button--danger {
+  color: #fff;
+  background: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.button--danger:hover:not(:disabled) {
+  background: #a82222;
+}
+
+.button--danger-outline {
+  color: var(--color-danger);
+  border-color: #efb9b9;
+}
+
+.button--danger-outline:hover:not(:disabled) {
+  background: var(--color-danger-soft);
+}
+
+.page-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ---------- 사원 상세 ---------- */
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 20px 24px;
+}
+
+.profile__avatar {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  border-radius: 50%;
+}
+
+.profile__name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+}
+
+.profile__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+  color: var(--color-text-muted);
+}
+
+.detail-card {
+  padding: 4px 24px 8px;
+}
+
+.detail-card .form-section__title {
+  margin: 0;
+  padding: 18px 0 12px;
+}
+
+.detail-card .form-section__title:not(:first-child) {
+  border-top: 1px solid var(--color-border);
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 24px;
+  margin: 0 0 18px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detail-item__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-subtle);
+}
+
+.detail-item__value {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- 확인 대화상자 ---------- */
+.dialog {
+  width: min(440px, calc(100vw - 32px));
+  padding: 24px;
+  color: var(--color-text);
+  border: none;
+  border-radius: var(--radius);
+  box-shadow: 0 20px 48px rgba(16, 24, 40, 0.24);
+}
+
+.dialog::backdrop {
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.dialog__title {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.dialog__body {
+  margin-top: 10px;
+  color: var(--color-text-muted);
+}
+
+.dialog__list {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  font-size: 13px;
+}
+
+.dialog__list li + li {
+  margin-top: 4px;
+}
+
+.dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 22px;
+}
+
 /* ---------- 빈 화면 ---------- */
 .empty-state {
   display: flex;
@@ -680,7 +830,8 @@ a.sidebar__link:hover {
     padding: 4px 16px 0;
   }
 
-  .form-grid {
+  .form-grid,
+  .detail-grid {
     grid-template-columns: 1fr;
   }
 }

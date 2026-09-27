@@ -48,7 +48,7 @@ export default function EmployeeListPage() {
       <PageHeader
         breadcrumbs={[{ label: '사원 관리' }, { label: '사원 목록' }]}
         title="사원 목록"
-        description="등록된 사원의 기본 정보와 재직 상태를 확인합니다."
+        description="등록된 사원의 기본 정보와 재직 상태를 확인합니다. 이름을 누르면 상세 정보를 볼 수 있습니다."
         actions={
           <Link to="/employees/new" className="button button--primary">
             + 사원 등록
@@ -120,7 +120,11 @@ export default function EmployeeListPage() {
                 employees.map((employee) => (
                   <tr key={employee.id}>
                     <td className="table__mono">{employee.employeeNo}</td>
-                    <td className="table__strong">{employee.name}</td>
+                    <td className="table__strong">
+                      <Link to={`/employees/${employee.id}`} className="table__link">
+                        {employee.name}
+                      </Link>
+                    </td>
                     <td>{display(employee.department)}</td>
                     <td>{display(employee.position)}</td>
                     <td className="table__mono">{employee.hireDate}</td>

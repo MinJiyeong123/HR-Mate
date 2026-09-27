@@ -124,3 +124,14 @@ export async function updateEmployee(id, payload) {
   employees = employees.map((item) => (item.id === current.id ? updated : item))
   return toResponse(updated)
 }
+
+/**
+ * 사원 논리적 삭제. 데이터는 남기고 삭제 시각(deletedAt)만 기록한다.
+ * 삭제된 사원은 목록·조회·수정에서 제외되지만 사번은 계속 사용 중으로 취급한다.
+ */
+export async function deleteEmployee(id) {
+  await wait()
+  const current = findActiveEmployee(id)
+  const deleted = { ...current, deletedAt: new Date().toISOString() }
+  employees = employees.map((item) => (item.id === current.id ? deleted : item))
+}
