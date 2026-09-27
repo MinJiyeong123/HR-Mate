@@ -143,9 +143,9 @@
 | UNSUPPORTED_MEDIA_TYPE | 415 | JSON이 아닌 요청 본문 |
 | INTERNAL_ERROR | 500 | 예상하지 못한 오류 (상세 원인은 서버 로그에만 기록) |
 
-## 프론트엔드 연결 시 대응표 (아직 연결 전)
+## 프론트엔드 대응표 (연결됨)
 
-`frontend/src/api/employeeApi.js`의 함수 이름·입출력을 유지하고 내부만 아래 API 호출로 바꿉니다.
+`frontend/src/api/employeeApi.js`가 아래 API를 호출합니다. 요청 본문에는 이 명세에 정의된 항목만 담습니다.
 
 | 프론트엔드 함수 | API |
 |---|---|
@@ -156,5 +156,5 @@
 | `updateEmployee(id, payload)` | `PUT /api/employees/{id}` |
 | `deleteEmployee(id)` | `DELETE /api/employees/{id}` |
 
-- 오류 응답의 `status`, `message`, `fieldErrors`는 현재 가짜 API의 `ApiError(status, message, fieldErrors)`와 같은 의미입니다.
-- 개발 서버 주소가 다르므로(5173 ↔ 8080) 연결 단계에서 Vite 프록시 설정이 필요합니다.
+- 오류 응답은 프론트엔드에서 `ApiError(status, message, fieldErrors)`로 바뀝니다. 서버에 연결하지 못하면 `status`가 `0`입니다.
+- 개발 중에는 Vite 프록시(`frontend/vite.config.js`)가 `/api` 요청을 `http://localhost:8080`으로 전달합니다.

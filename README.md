@@ -30,32 +30,15 @@ HR-Mate/
 ├─ CLAUDE.md            개발 지침
 ├─ docs/                요구사항, 진행 기록
 ├─ backend/             Spring Boot 서버 (사원 API)
-└─ frontend/            React 화면 (가짜 데이터로 동작 중)
+└─ frontend/            React 화면 (백엔드 API와 연결)
 ```
 
 ## 실행 방법
 
-### 프론트엔드 (현재: 가짜 데이터로 동작)
+Windows PowerShell 기준입니다. **터미널 2개**를 열어 백엔드 → 프론트엔드 순서로 실행합니다.
+화면(5173)의 `/api` 요청은 Vite 프록시가 백엔드(8080)로 전달합니다.
 
-Windows PowerShell 기준입니다. 처음 한 번만 라이브러리를 설치합니다.
-
-```powershell
-cd C:\Users\ADMIN\Desktop\HR-Mate\frontend
-npm install
-```
-
-개발 서버 실행:
-
-```powershell
-npm run dev
-```
-
-브라우저에서 http://localhost:5173 을 엽니다. 종료는 터미널에서 `Ctrl + C`.
-
-- 아직 백엔드·DB와 연결되지 않았습니다. `frontend/src/api/employeeApi.js`가 가짜 데이터(`frontend/src/mocks/mockEmployees.js`)로 동작합니다.
-- 새로고침하면 등록·수정한 내용이 초기화됩니다.
-
-### 백엔드 (현재: 사원 API 구현, 프론트엔드와는 아직 미연결)
+### 1. 백엔드 (터미널 1)
 
 API 명세: [docs/api/employee-api.md](docs/api/employee-api.md)
 
@@ -79,6 +62,27 @@ API 명세: [docs/api/employee-api.md](docs/api/employee-api.md)
    ```
 
    로그에 `Started HrMateApplication`이 나오면 성공입니다. 종료는 `Ctrl + C`.
+
+### 2. 프론트엔드 (터미널 2)
+
+처음 한 번만 라이브러리를 설치합니다.
+
+```powershell
+cd C:\Users\ADMIN\Desktop\HR-Mate\frontend
+npm install
+```
+
+개발 서버 실행:
+
+```powershell
+npm run dev
+```
+
+브라우저에서 http://localhost:5173 을 엽니다. 종료는 터미널에서 `Ctrl + C`.
+
+- 등록·수정·삭제한 내용은 개발용 DB(`hr_mate`)에 저장됩니다. 가상 데이터만 입력하세요.
+- 삭제는 논리 삭제라 삭제한 사원의 사번은 다시 사용할 수 없습니다.
+- 백엔드가 꺼져 있으면 화면에 "서버에 연결할 수 없습니다" 안내가 나옵니다.
 
 ## 진행 상황
 

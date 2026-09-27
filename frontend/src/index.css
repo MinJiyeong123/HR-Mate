@@ -377,6 +377,10 @@ a.sidebar__link:hover {
   color: var(--color-danger);
 }
 
+.table__retry {
+  margin-top: 12px;
+}
+
 /* ---------- 배지 ---------- */
 .badge {
   display: inline-block;

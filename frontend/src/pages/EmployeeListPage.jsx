@@ -15,6 +15,8 @@ export default function EmployeeListPage() {
   const [employees, setEmployees] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  // 다시 시도 버튼을 누르면 값이 바뀌어 목록을 다시 불러온다.
+  const [reloadKey, setReloadKey] = useState(0)
   // 등록·수정 화면에서 넘겨준 완료 메시지
   const [notice, setNotice] = useState(location.state?.notice ?? '')
 
@@ -29,8 +31,8 @@ export default function EmployeeListPage() {
       .then((data) => {
         if (!ignore) setEmployees(data)
       })
-      .catch(() => {
-        if (!ignore) setError('사원 목록을 불러오지 못했습니다.')
+      .catch((err) => {
+        if (!ignore) setError(err.message || '사원 목록을 불러오지 못했습니다.')
       })
       .finally(() => {
         if (!ignore) setLoading(false)
@@ -38,7 +40,13 @@ export default function EmployeeListPage() {
     return () => {
       ignore = true
     }
-  }, [])
+  }, [reloadKey])
+
+  function handleRetry() {
+    setLoading(true)
+    setError('')
+    setReloadKey((key) => key + 1)
+  }
 
   const activeCount = employees.filter((item) => item.employmentStatus === EMPLOYMENT_STATUS.ACTIVE).length
   const resignedCount = employees.length - activeCount
@@ -68,15 +76,15 @@ export default function EmployeeListPage() {
       <div className="stats">
         <div className="stat-card">
           <span className="stat-card__label">전체 사원</span>
-          <strong className="stat-card__value">{loading ? '–' : employees.length}</strong>
+          <strong className="stat-card__value">{loading || error ? '–' : employees.length}</strong>
         </div>
         <div className="stat-card stat-card--active">
           <span className="stat-card__label">재직</span>
-          <strong className="stat-card__value">{loading ? '–' : activeCount}</strong>
+          <strong className="stat-card__value">{loading || error ? '–' : activeCount}</strong>
         </div>
         <div className="stat-card stat-card--resigned">
           <span className="stat-card__label">퇴사</span>
-          <strong className="stat-card__value">{loading ? '–' : resignedCount}</strong>
+          <strong className="stat-card__value">{loading || error ? '–' : resignedCount}</strong>
         </div>
       </div>
 
@@ -107,7 +115,12 @@ export default function EmployeeListPage() {
               )}
               {!loading && error && (
                 <tr>
-                  <td colSpan={7} className="table__empty table__empty--error">{error}</td>
+                  <td colSpan={7} className="table__empty table__empty--error">
+                    <p>{error}</p>
+                    <button type="button" className="button button--secondary table__retry" onClick={handleRetry}>
+                      다시 시도
+                    </button>
+                  </td>
                 </tr>
               )}
               {!loading && !error && employees.length === 0 && (
