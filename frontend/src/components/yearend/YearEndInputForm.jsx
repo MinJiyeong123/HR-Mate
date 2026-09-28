@@ -71,8 +71,9 @@ function CountSelect({ name, label, value, max, onChange, disabled, error, hint 
  * 연말정산 입력 폼 (인원 수·해당 여부만, 개인 식별 정보 없음)
  * - onSubmit(values): 실패 시 { message, fieldErrors } 오류를 던진다.
  * - readOnly: 삭제된 사원 등 저장할 수 없을 때
+ * - childAgeGuide: { minimumAge, basis, caution } 귀속연도별 자녀 연령 기준 안내(서버 제공, 계산에는 쓰지 않음)
  */
-export default function YearEndInputForm({ initialValues, readOnly = false, onSubmit, onCancel }) {
+export default function YearEndInputForm({ initialValues, readOnly = false, childAgeGuide, onSubmit, onCancel }) {
   const [values, setValues] = useState(initialValues)
   const [errors, setErrors] = useState({})
   const [formError, setFormError] = useState('')
@@ -178,6 +179,16 @@ export default function YearEndInputForm({ initialValues, readOnly = false, onSu
 
       <section className="form-section">
         <h2 className="form-section__title">자녀세액공제</h2>
+        {childAgeGuide?.basis && (
+          <p className="form-field__hint yearend-age-basis" id="childCreditAgeBasis">
+            연령 기준 안내: {childAgeGuide.basis}
+          </p>
+        )}
+        {childAgeGuide?.caution && (
+          <p className="yearend-caution" role="note" id="childCreditAgeCaution">
+            {childAgeGuide.caution}
+          </p>
+        )}
         <div className="form-grid">
           <CountSelect
             name="childCreditCount"
@@ -185,7 +196,11 @@ export default function YearEndInputForm({ initialValues, readOnly = false, onSu
             value={values.childCreditCount}
             max={max.childCreditCount}
             error={errors.childCreditCount}
-            hint="기본공제 대상 자녀·손자녀 중 8세 이상 (2025년 귀속 국세청 안내 기준), 부양가족 인원 이하"
+            hint={
+              childAgeGuide?.minimumAge != null
+                ? `기본공제 대상 자녀·손자녀 중 ${childAgeGuide.minimumAge}세 이상(위 연령 기준 안내 참고), 부양가족 인원 이하`
+                : '기본공제 대상 자녀·손자녀(연령 기준은 위 안내 참고), 부양가족 인원 이하'
+            }
             {...common}
           />
           <CountSelect

@@ -17,10 +17,15 @@ import java.util.Map;
  */
 public final class YearEndCalculator {
 
-    /** 규칙이 등록되지 않은 연도에 대신 적용하는 규칙 */
+    /** 규칙이 등록되지 않은 연도에 대신 적용하는 규칙 (등록되지 않은 연도는 항상 2025년 규칙으로 대체) */
     static final TaxRules FALLBACK_RULES = new TaxRules2025();
 
-    private static final Map<Integer, TaxRules> RULES = Map.of(FALLBACK_RULES.year(), FALLBACK_RULES);
+    private static final TaxRules RULES_2026 = new TaxRules2026();
+
+    /** 등록된 귀속연도별 규칙 (2025, 2026) */
+    private static final Map<Integer, TaxRules> RULES = Map.of(
+            FALLBACK_RULES.year(), FALLBACK_RULES,
+            RULES_2026.year(), RULES_2026);
 
     /** 공식 자료로 확인하지 못해 가정한 계산 방식 (요구사항 5-9) */
     public static final List<String> ASSUMPTIONS = List.of(
@@ -39,6 +44,7 @@ public final class YearEndCalculator {
             warnings.add("%d년 귀속 급여에 %d년 귀속 규칙을 적용한 결과입니다. %d년 개정 사항은 반영되지 않았습니다."
                     .formatted(input.taxYear(), rules.year(), input.taxYear()));
         }
+        warnings.addAll(rules.ruleNotes()); // 예: 2026년 규칙의 확인 상태(국세청 안내 미확인 등)
         PersonalDeductionInput personal = input.personal();
         if (personal == null) {
             personal = PersonalDeductionInput.SELF_ONLY;

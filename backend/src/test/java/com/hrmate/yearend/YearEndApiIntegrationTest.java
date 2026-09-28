@@ -100,7 +100,11 @@ class YearEndApiIntegrationTest {
         mockMvc.perform(get(base() + "/input"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.saved").value(false))
-                .andExpect(jsonPath("$.editable").value(true));
+                .andExpect(jsonPath("$.editable").value(true))
+                // 2099년: 계산은 2025년 규칙으로 대체, 자녀 연령은 본문 기준(13세)을 참고로 안내, 2017년생 주의 없음
+                .andExpect(jsonPath("$.childCreditMinimumAge").value(13))
+                .andExpect(jsonPath("$.childCreditAgeBasis").value(org.hamcrest.Matchers.startsWith("참고:")))
+                .andExpect(jsonPath("$.childCreditAgeCaution").doesNotExist());
 
         // 입력 저장 (배우자 + 자녀 1명)
         mockMvc.perform(put(base() + "/input").contentType(MediaType.APPLICATION_JSON).content(INPUT_BODY))
@@ -139,6 +143,7 @@ class YearEndApiIntegrationTest {
         // 목록
         mockMvc.perform(get("/api/year-end/2099/employees"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.employeeNo == 'ZZYEIT01')].rulesYear").value(2025))
                 .andExpect(jsonPath("$[?(@.employeeNo == 'ZZYEIT01')].inputSaved").value(true))
                 .andExpect(jsonPath("$[?(@.employeeNo == 'ZZYEIT01')].balance").value(1_303_750));
     }

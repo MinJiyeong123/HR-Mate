@@ -77,6 +77,11 @@ export default function YearEndInputPage() {
       <YearEndInputForm
         initialValues={pickInput(data.input)}
         readOnly={!data.input.editable}
+        childAgeGuide={{
+          minimumAge: data.input.childCreditMinimumAge,
+          basis: data.input.childCreditAgeBasis,
+          caution: data.input.childCreditAgeCaution,
+        }}
         onSubmit={handleSubmit}
         onCancel={() => navigate(resultPath)}
       />

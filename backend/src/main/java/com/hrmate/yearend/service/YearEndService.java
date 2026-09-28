@@ -8,6 +8,7 @@ import com.hrmate.global.error.ErrorCode;
 import com.hrmate.payroll.domain.Payroll;
 import com.hrmate.payroll.domain.PayrollPeriodStatus;
 import com.hrmate.payroll.repository.PayrollRepository;
+import com.hrmate.yearend.calculator.ChildCreditAgeGuide;
 import com.hrmate.yearend.calculator.PersonalDeductionInput;
 import com.hrmate.yearend.calculator.YearEndCalculationInput;
 import com.hrmate.yearend.calculator.YearEndCalculationResult;
@@ -77,7 +78,7 @@ public class YearEndService {
                     return new YearEndEmployeeSummaryResponse(employee.getId(), latest.getEmployeeNo(),
                             latest.getEmployeeName(), latest.getDepartment(), latest.getPosition(), employee.isDeleted(),
                             isResigned(employee), input != null, payrolls.size(), result.totalSalary(),
-                            result.determinedTax(), result.prepaidTax(), result.balance());
+                            result.determinedTax(), result.prepaidTax(), result.balance(), result.rulesYear());
                 })
                 .toList();
     }
@@ -144,6 +145,11 @@ public class YearEndService {
         YearEndPayrollTotals totals = YearEndPayrollTotals.of(payrolls);
         YearEndCalculationResult result = calculate(taxYear, totals, input);
         List<String> warnings = new ArrayList<>(result.warnings());
+        // 2017년생 연령 기준 주의(해석 미확정): 자녀세액공제 대상 자녀를 1명 이상 입력한 경우에만 안내한다.
+        String childCaution = ChildCreditAgeGuide.forYear(taxYear).caution();
+        if (childCaution != null && input != null && input.toPersonalDeductionInput().childCreditCount() > 0) {
+            warnings.add(childCaution);
+        }
         if (!totals.mealOverLimitMonths().isEmpty()) {
             String months = totals.mealOverLimitMonths().stream().map(month -> month + "월")
                     .collect(Collectors.joining(", "));

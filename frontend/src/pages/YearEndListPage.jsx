@@ -43,6 +43,8 @@ export default function YearEndListPage() {
   const savedCount = employees.filter((employee) => employee.inputSaved).length
   const payTotal = employees.reduce((sum, employee) => sum + Math.max(employee.balance, 0), 0)
   const refundTotal = employees.reduce((sum, employee) => sum + Math.max(-employee.balance, 0), 0)
+  // 실제로 적용한 계산 규칙 연도 (서버 응답, 등록되지 않은 연도는 2025). 사원이 없으면 알 수 없음
+  const rulesYear = employees[0]?.rulesYear
   const resultPath = (employeeId) => `/year-end/employees/${employeeId}?year=${encodeURIComponent(year)}`
 
   function statValue(value) {
@@ -75,9 +77,15 @@ export default function YearEndListPage() {
           <strong className="stat-card__value stat-card__value--money">{statValue(formatWon(refundTotal))}</strong>
         </div>
         <div className="stat-card">
-          <span className="stat-card__label">적용 규칙</span>
-          <strong className="stat-card__value stat-card__value--money">2025년 귀속</strong>
-          <span className="stat-card__sub">다른 연도는 결과 화면에서 경고</span>
+          <span className="stat-card__label">적용 계산 규칙</span>
+          <strong className="stat-card__value stat-card__value--money">
+            {statValue(rulesYear ? `${rulesYear}년 귀속` : '–')}
+          </strong>
+          <span className="stat-card__sub">
+            {rulesYear && rulesYear !== Number(year)
+              ? `${year}년 규칙 미등록 → 2025년 귀속 규칙으로 대체`
+              : '연도별 규칙 · 결과 화면에서 확인 상태 안내'}
+          </span>
         </div>
       </div>
 

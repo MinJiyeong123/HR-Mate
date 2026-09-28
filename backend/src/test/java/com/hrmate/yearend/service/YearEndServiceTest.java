@@ -82,7 +82,11 @@ class YearEndServiceTest {
 
     /** 기본급 300만, 식대, 건강 10만, 장기요양 1만, 고용 2만, 국민연금 13만5천, 소득세 5만 → 기간 확정 */
     private static Payroll confirmedPayroll(Employee employee, int month, long meal) {
-        PayrollPeriod period = PayrollPeriod.create(2025, month, LocalDate.of(2025, month, 25));
+        return confirmedPayroll(2025, employee, month, meal);
+    }
+
+    private static Payroll confirmedPayroll(int year, Employee employee, int month, long meal) {
+        PayrollPeriod period = PayrollPeriod.create(year, month, LocalDate.of(year, month, 25));
         Payroll payroll = Payroll.create(period, employee, List.of(
                 new PayrollLineInput(BASE, 3_000_000L), new PayrollLineInput(MEAL, meal),
                 new PayrollLineInput(HEALTH, 100_000L), new PayrollLineInput(CARE, 10_000L),
@@ -127,6 +131,54 @@ class YearEndServiceTest {
                 "식대가 월 20만원을 넘는 달이 있습니다(2월). 비과세 한도 초과분의 과세 전환은 반영하지 않았습니다.",
                 "작성 중인 급여 1건은 계산에서 제외했습니다.");
         assertThat(result.assumptions()).hasSize(3);
+    }
+
+    @Test
+    void 연도_2026_결과는_규칙_안내를_붙이고_자녀가_있을_때만_2017년생_주의를_붙인다() {
+        Employee kim = employee(7L, "E001");
+        Employee lee = employee(8L, "E002");
+        when(employeeRepository.findById(7L)).thenReturn(Optional.of(kim));
+        when(employeeRepository.findById(8L)).thenReturn(Optional.of(lee));
+        when(payrollRepository.findAllForAnnualByEmployee(7L, 2026, PayrollPeriodStatus.CONFIRMED))
+                .thenReturn(List.of(confirmedPayroll(2026, kim, 1, 0)));
+        when(payrollRepository.findAllForAnnualByEmployee(8L, 2026, PayrollPeriodStatus.CONFIRMED))
+                .thenReturn(List.of(confirmedPayroll(2026, lee, 1, 0)));
+        // 7: 자녀세액공제 대상 자녀 1명 / 8: 자녀 0명
+        when(inputRepository.findByEmployee_IdAndTaxYear(7L, 2026)).thenReturn(Optional.of(
+                YearEndInput.create(kim, 2026, new PersonalDeductionInput(false, 1, 0, 0, false, false, 1, 0, 0, 0))));
+        when(inputRepository.findByEmployee_IdAndTaxYear(8L, 2026)).thenReturn(Optional.of(
+                YearEndInput.create(lee, 2026, PersonalDeductionInput.SELF_ONLY)));
+
+        YearEndResultResponse withChild = service.getResult(7L, 2026);
+        YearEndResultResponse noChild = service.getResult(8L, 2026);
+
+        assertThat(withChild.calculation().rulesYear()).isEqualTo(2026);
+        assertThat(withChild.warnings()).anyMatch(w -> w.contains("법률 제21548호") && w.contains("국세청 2026년 귀속 안내는 확인하지 못했고"));
+        assertThat(withChild.warnings()).anyMatch(w -> w.contains("2017년생") && w.contains("해석 미확정"));
+        assertThat(withChild.warnings()).noneMatch(w -> w.contains("2025년 귀속 규칙을 적용한 결과"));
+        assertThat(noChild.warnings()).anyMatch(w -> w.contains("법률 제21548호"));
+        assertThat(noChild.warnings()).noneMatch(w -> w.contains("2017년생"));
+    }
+
+    @Test
+    void 입력_조회는_귀속연도별_자녀_연령_안내를_돌려준다() {
+        Employee kim = employee(7L, "E001");
+        when(employeeRepository.findById(7L)).thenReturn(Optional.of(kim));
+        when(inputRepository.findByEmployee_IdAndTaxYear(any(), anyInt())).thenReturn(Optional.empty());
+
+        YearEndInputResponse y2025 = service.getInput(7L, 2025);
+        YearEndInputResponse y2026 = service.getInput(7L, 2026);
+        YearEndInputResponse y2027 = service.getInput(7L, 2027);
+        YearEndInputResponse y2024 = service.getInput(7L, 2024);
+
+        assertThat(y2025.childCreditMinimumAge()).isEqualTo(8);
+        assertThat(y2025.childCreditAgeCaution()).isNull();
+        assertThat(y2026.childCreditMinimumAge()).isEqualTo(9);
+        assertThat(y2026.childCreditAgeCaution()).contains("2017년생");
+        assertThat(y2027.childCreditMinimumAge()).isEqualTo(10);
+        assertThat(y2027.childCreditAgeBasis()).startsWith("참고:").contains("2025년 귀속 규칙으로 대체");
+        assertThat(y2024.childCreditMinimumAge()).isNull();
+        assertThat(y2024.childCreditAgeBasis()).startsWith("이 연도의 나이 기준은 확인하지 않았습니다.");
     }
 
     @Test

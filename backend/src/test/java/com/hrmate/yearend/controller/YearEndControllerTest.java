@@ -47,24 +47,28 @@ class YearEndControllerTest {
     @Test
     void 목록() throws Exception {
         when(yearEndService.getEmployees(2025)).thenReturn(List.of(new YearEndEmployeeSummaryResponse(
-                7L, "E001", "김가상", "인사팀", "대리", false, false, true, 12, 36_000_000, 433_500, 1_000_000, -566_500)));
+                7L, "E001", "김가상", "인사팀", "대리", false, false, true, 12, 36_000_000, 433_500, 1_000_000, -566_500, 2025)));
 
         mockMvc.perform(get("/api/year-end/2025/employees"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].employeeNo").value("E001"))
                 .andExpect(jsonPath("$[0].inputSaved").value(true))
-                .andExpect(jsonPath("$[0].balance").value(-566_500));
+                .andExpect(jsonPath("$[0].balance").value(-566_500))
+                .andExpect(jsonPath("$[0].rulesYear").value(2025));
     }
 
     @Test
     void 입력_저장_성공과_항목별_검증_오류() throws Exception {
         when(yearEndService.saveInput(eq(7L), eq(2025), any())).thenReturn(new YearEndInputResponse(
-                2025, 7L, true, true, true, 1, 0, 0, false, false, 1, 0, 0, 0, null));
+                2025, 7L, true, true, true, 1, 0, 0, false, false, 1, 0, 0, 0, null,
+                8, "2025년 귀속: 소득세법(2026. 4. 21. 개정 전 문구)·국세청 2025년 귀속 안내 기준 · 전문가 검증 전", null));
 
         mockMvc.perform(put("/api/year-end/2025/employees/7/input").contentType(MediaType.APPLICATION_JSON).content(VALID_BODY))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.saved").value(true))
-                .andExpect(jsonPath("$.childCreditCount").value(1));
+                .andExpect(jsonPath("$.childCreditCount").value(1))
+                .andExpect(jsonPath("$.childCreditMinimumAge").value(8))
+                .andExpect(jsonPath("$.childCreditAgeCaution").doesNotExist());
 
         String invalid = VALID_BODY.replace("\"dependentCount\":1", "\"dependentCount\":21")
                 .replace("\"birthFirstCount\":0", "\"birthFirstCount\":2");

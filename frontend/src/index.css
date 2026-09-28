@@ -960,6 +960,20 @@ a.sidebar__link:hover {
   background: var(--color-surface-muted) !important;
 }
 
+.yearend-age-basis {
+  margin: -6px 0 8px;
+}
+
+.yearend-caution {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: var(--color-warning-text);
+  background: var(--color-warning-soft);
+  border: 1px solid #f1e2b8;
+  border-radius: var(--radius-small);
+}
+
 .yearend-warnings ul,
 .yearend-assumptions {
   margin: 0;

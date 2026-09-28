@@ -76,10 +76,11 @@ class YearEndCalculatorTest {
 
     @Test
     void 입력_자료가_없고_규칙이_없는_연도이며_공제가_소득을_넘는_경우() {
-        // 2026년 귀속 → 2025년 규칙 적용. 총급여 320만 → 근로소득공제 224만, 근로소득금액 96만
-        YearEndCalculationResult result = calculate(2026, 3_200_000, 0, 0, 100_000, null);
+        // 2027년 귀속(규칙 미등록) → 2025년 규칙으로 대체. 총급여 320만 → 근로소득공제 224만, 근로소득금액 96만
+        // (4-6에서 2026년 규칙이 등록되어 이 테스트의 대체 연도를 2026 → 2027로 바꿈. 금액·경고 구성은 동일)
+        YearEndCalculationResult result = calculate(2027, 3_200_000, 0, 0, 100_000, null);
 
-        assertThat(result.taxYear()).isEqualTo(2026);
+        assertThat(result.taxYear()).isEqualTo(2027);
         assertThat(result.rulesYear()).isEqualTo(2025);
         assertThat(result.earnedIncomeAmount()).isEqualTo(960_000);
         assertThat(result.personalDeduction()).isEqualTo(new AppliedAmount(1_500_000, 960_000));
@@ -89,10 +90,37 @@ class YearEndCalculatorTest {
         assertThat(result.determinedTax()).isZero();
         assertThat(result.refund()).isEqualTo(100_000);
         assertThat(result.warnings()).containsExactly(
-                "2026년 귀속 급여에 2025년 귀속 규칙을 적용한 결과입니다. 2026년 개정 사항은 반영되지 않았습니다.",
+                "2027년 귀속 급여에 2025년 귀속 규칙을 적용한 결과입니다. 2027년 개정 사항은 반영되지 않았습니다.",
                 "연말정산 입력 자료가 없어 본인 기본공제만 적용했습니다.",
                 "인적공제 중 540,000원은 한도 초과로 적용되지 않았습니다.",
                 "세액공제 중 130,000원은 산출세액을 넘어 적용되지 않았습니다.");
+    }
+
+    @Test
+    void 연도_2026은_등록된_2026년_규칙으로_계산하고_금액은_2025와_같다() {
+        // 같은 입력을 2025·2026으로 계산: 금액은 모두 같고, 2026은 대체 경고 대신 규칙 확인 상태 안내가 붙는다.
+        PersonalDeductionInput input = personal(true, 1, false, false, 1, 0);
+        YearEndCalculationResult y2025 = calculate(2025, 36_000_000, 1_500_000, 1_620_000, 1_000_000, input);
+        YearEndCalculationResult y2026 = calculate(2026, 36_000_000, 1_500_000, 1_620_000, 1_000_000, input);
+
+        assertThat(y2026.rulesYear()).isEqualTo(2026);
+        assertThat(y2026.taxBase()).isEqualTo(y2025.taxBase());
+        assertThat(y2026.calculatedTax()).isEqualTo(y2025.calculatedTax());
+        assertThat(y2026.taxCredit()).isEqualTo(y2025.taxCredit());
+        assertThat(y2026.determinedTax()).isEqualTo(433_500);
+        assertThat(y2026.balance()).isEqualTo(y2025.balance()).isEqualTo(-566_500);
+        assertThat(y2025.warnings()).isEmpty();
+        assertThat(y2026.warnings()).containsExactly(TaxRules2026.RULE_NOTE);
+    }
+
+    @Test
+    void 연도_2024는_2025년_규칙으로_대체하고_경고한다() {
+        YearEndCalculationResult result = calculate(2024, 36_000_000, 0, 0, 1_471_500, PersonalDeductionInput.SELF_ONLY);
+
+        assertThat(result.rulesYear()).isEqualTo(2025);
+        assertThat(result.balance()).isZero(); // 2025년 귀속 계산과 같음(보험료 없음 → 표준세액공제)
+        assertThat(result.warnings()).containsExactly(
+                "2024년 귀속 급여에 2025년 귀속 규칙을 적용한 결과입니다. 2024년 개정 사항은 반영되지 않았습니다.");
     }
 
     @Test

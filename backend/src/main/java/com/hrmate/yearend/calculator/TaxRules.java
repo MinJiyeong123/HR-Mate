@@ -1,5 +1,7 @@
 package com.hrmate.yearend.calculator;
 
+import java.util.List;
+
 /**
  * 귀속연도별 연말정산 계산 규칙 (포트폴리오용 모의 계산, 전문가 검증 전)
  *
@@ -53,5 +55,10 @@ public interface TaxRules {
     /** 근로소득세액공제 = min(공제액, 한도) */
     default long earnedIncomeTaxCredit(long calculatedTax, long totalSalary) {
         return Math.min(earnedIncomeTaxCreditAmount(calculatedTax), earnedIncomeTaxCreditLimit(totalSalary));
+    }
+
+    /** 이 규칙의 확인 상태 안내 (계산 결과 경고에 덧붙인다. 계산에는 쓰지 않는다). 없으면 빈 목록 */
+    default List<String> ruleNotes() {
+        return List.of();
     }
 }
