@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -53,18 +54,45 @@ class SampleDataScriptTest {
         return Files.readString(SCRIPT, StandardCharsets.UTF_8);
     }
 
-    /** 주석과 USE 문을 뺀 INSERT 문 (끝의 ; 제외) */
+    /**
+     * 주석, USE 문, COMMIT 문을 뺀 INSERT 문 (끝의 ; 제외)
+     * COMMIT 은 테스트에서 실행하지 않는다. 실행하면 테스트 트랜잭션의 롤백이 깨진다.
+     */
     private static String insertStatement(String script) {
         String body = script.lines()
                 .filter(line -> !line.strip().startsWith("--"))
                 .filter(line -> !line.strip().toUpperCase(Locale.ROOT).startsWith("USE "))
+                .filter(line -> !line.strip().equalsIgnoreCase("COMMIT;"))
                 .collect(joining("\n"))
                 .strip();
         return body.endsWith(";") ? body.substring(0, body.length() - 1) : body;
     }
 
+    /** 주석을 뺀 실행 문장 목록 (세미콜론 기준) */
+    private static List<String> statements(String script) {
+        String body = script.lines()
+                .filter(line -> !line.strip().startsWith("--"))
+                .collect(joining("\n"));
+        return Arrays.stream(body.split(";"))
+                .map(String::strip)
+                .filter(statement -> !statement.isEmpty())
+                .toList();
+    }
+
     private long countAllEmployees() {
         return ((Number) entityManager.createNativeQuery("SELECT COUNT(*) FROM employee").getSingleResult()).longValue();
+    }
+
+    @Test
+    void 파일은_USE_INSERT_COMMIT_세_문장으로_이루어져_있다() throws IOException {
+        List<String> statements = statements(readScript()).stream()
+                .map(statement -> statement.toUpperCase(Locale.ROOT))
+                .toList();
+
+        assertThat(statements).hasSize(3);
+        assertThat(statements.get(0)).isEqualTo("USE HR_MATE");
+        assertThat(statements.get(1)).startsWith("INSERT INTO EMPLOYEE");
+        assertThat(statements.get(2)).isEqualTo("COMMIT"); // 자동 커밋이 꺼진 세션에서도 입력을 확정
     }
 
     @Test
