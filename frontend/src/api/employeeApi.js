@@ -1,64 +1,15 @@
 // ------------------------------------------------------------------
 // 사원 API 호출 (백엔드 명세: docs/api/employee-api.md)
 // - 화면(pages, components)은 이 파일의 함수만 사용한다.
-// - 주소는 상대 경로(/api/...)를 쓴다. 개발 중에는 Vite 프록시가 백엔드(8080)로 전달한다.
+// - 요청·오류 처리는 공통 모듈(api/client.js)을 사용한다.
 // - 요청 본문에는 API 명세에 정의된 항목만 담는다.
 // ------------------------------------------------------------------
 
+import { request } from './client'
+
+export { ApiError } from './client'
+
 const BASE_URL = '/api/employees'
-
-const NETWORK_ERROR_MESSAGE = '서버에 연결할 수 없습니다. 백엔드 서버가 실행 중인지 확인해 주세요.'
-
-const DEFAULT_MESSAGES = {
-  400: '입력값을 확인해 주세요.',
-  404: '요청한 정보를 찾을 수 없습니다.',
-  409: '이미 사용된 값입니다.',
-}
-const SERVER_ERROR_MESSAGE = '요청을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.'
-
-export class ApiError extends Error {
-  constructor(status, message, fieldErrors = {}) {
-    super(message)
-    this.name = 'ApiError'
-    this.status = status // 0: 서버에 연결하지 못함
-    this.fieldErrors = fieldErrors
-  }
-}
-
-async function readJson(response) {
-  const contentType = response.headers.get('Content-Type') ?? ''
-  if (!contentType.includes('application/json')) return null
-  try {
-    return await response.json()
-  } catch {
-    return null
-  }
-}
-
-async function request(path, { method = 'GET', body } = {}) {
-  const options = { method, headers: { Accept: 'application/json' } }
-  if (body !== undefined) {
-    options.headers['Content-Type'] = 'application/json'
-    options.body = JSON.stringify(body)
-  }
-
-  let response
-  try {
-    response = await fetch(path, options)
-  } catch {
-    throw new ApiError(0, NETWORK_ERROR_MESSAGE)
-  }
-
-  if (response.status === 204) return null
-
-  const data = await readJson(response)
-  if (response.ok) return data
-
-  // 공통 오류 응답 { status, code, message, fieldErrors } 이 없으면(예: 프록시 오류) 상태별 기본 안내
-  const fallback =
-    response.status >= 500 ? (data ? SERVER_ERROR_MESSAGE : NETWORK_ERROR_MESSAGE) : DEFAULT_MESSAGES[response.status]
-  throw new ApiError(response.status, data?.message ?? fallback ?? SERVER_ERROR_MESSAGE, data?.fieldErrors ?? {})
-}
 
 /** 등록 요청 본문 (명세 3장: 재직 상태는 보내지 않음) */
 function toCreateBody(payload) {

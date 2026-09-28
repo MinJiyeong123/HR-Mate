@@ -28,11 +28,8 @@ function DocumentIcon() {
   )
 }
 
-// 급여 관리·연말정산은 추후 단계에서 구현한다. 지금은 메뉴 위치만 보여 준다.
-const UPCOMING_MENUS = [
-  { label: '급여 관리', icon: <WalletIcon /> },
-  { label: '연말정산', icon: <DocumentIcon /> },
-]
+// 연말정산은 추후 단계에서 구현한다. 지금은 메뉴 위치만 보여 준다.
+const UPCOMING_MENUS = [{ label: '연말정산', icon: <DocumentIcon /> }]
 
 export default function Sidebar() {
   return (
@@ -53,6 +50,10 @@ export default function Sidebar() {
         </NavLink>
 
         <p className="sidebar__section">급여 · 세무</p>
+        <NavLink to="/payroll" className="sidebar__link">
+          <WalletIcon />
+          급여 관리
+        </NavLink>
         {UPCOMING_MENUS.map((menu) => (
           <span key={menu.label} className="sidebar__link sidebar__link--disabled" aria-disabled="true">
             {menu.icon}

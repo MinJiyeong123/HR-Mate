@@ -779,6 +779,84 @@ a.sidebar__link:hover {
   margin-top: 22px;
 }
 
+/* ---------- 급여 화면 ---------- */
+.notice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--color-warning-text);
+  background: var(--color-warning-soft);
+  border: 1px solid #f1e2b8;
+  border-radius: var(--radius-small);
+}
+
+.notice__title {
+  font-weight: 700;
+}
+
+.badge--draft {
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.badge--confirmed {
+  color: var(--color-success);
+  background: var(--color-success-soft);
+}
+
+.table__number {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.table__row--link {
+  cursor: pointer;
+}
+
+.table__sub-note {
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+.stats--four {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.stat-card__value--money {
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+}
+
+.detail-grid--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.inline-form {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.input--compact {
+  width: auto;
+  height: 30px;
+}
+
+.page-header__title-with-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.empty-state__actions {
+  display: flex;
+  gap: 8px;
+}
+
 /* ---------- 빈 화면 ---------- */
 .empty-state {
   display: flex;
@@ -835,8 +913,13 @@ a.sidebar__link:hover {
   }
 
   .form-grid,
-  .detail-grid {
+  .detail-grid,
+  .detail-grid--three {
     grid-template-columns: 1fr;
+  }
+
+  .stats--four {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 

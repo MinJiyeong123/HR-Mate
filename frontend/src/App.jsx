@@ -5,6 +5,9 @@ import EmployeeDetailPage from './pages/EmployeeDetailPage'
 import EmployeeEditPage from './pages/EmployeeEditPage'
 import EmployeeListPage from './pages/EmployeeListPage'
 import NotFoundPage from './pages/NotFoundPage'
+import PayrollPeriodCreatePage from './pages/PayrollPeriodCreatePage'
+import PayrollPeriodDetailPage from './pages/PayrollPeriodDetailPage'
+import PayrollPeriodListPage from './pages/PayrollPeriodListPage'
 
 export default function App() {
   return (
@@ -15,6 +18,9 @@ export default function App() {
         <Route path="employees/new" element={<EmployeeCreatePage />} />
         <Route path="employees/:id" element={<EmployeeDetailPage />} />
         <Route path="employees/:id/edit" element={<EmployeeEditPage />} />
+        <Route path="payroll" element={<PayrollPeriodListPage />} />
+        <Route path="payroll/new" element={<PayrollPeriodCreatePage />} />
+        <Route path="payroll/:periodId" element={<PayrollPeriodDetailPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
