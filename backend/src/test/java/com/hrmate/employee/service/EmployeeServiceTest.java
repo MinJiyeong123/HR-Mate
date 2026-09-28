@@ -102,7 +102,8 @@ class EmployeeServiceTest {
                 .satisfies(e -> {
                     BusinessException be = (BusinessException) e;
                     assertThat(be.getErrorCode()).isEqualTo(ErrorCode.INVALID_INPUT);
-                    assertThat(be.getFieldErrors()).containsKey("value");
+                    assertThat(be.getFieldErrors())
+                            .containsEntry("value", "사번은 공백 없이 영문·숫자 20자 이내로 입력해 주세요.");
                 });
     }
 

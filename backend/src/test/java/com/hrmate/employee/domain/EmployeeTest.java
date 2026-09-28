@@ -30,7 +30,9 @@ class EmployeeTest {
 
     @Test
     void 사번_형식이_맞지_않으면_거부한다() {
-        assertThatThrownBy(() -> Employee.normalizeEmployeeNo("E 001")).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> Employee.normalizeEmployeeNo("E 001"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("사번은 공백 없이 영문·숫자 20자 이내로 입력해 주세요.");
         assertThatThrownBy(() -> Employee.normalizeEmployeeNo("E-001")).isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> Employee.normalizeEmployeeNo("사번001")).isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> Employee.normalizeEmployeeNo("")).isInstanceOf(IllegalArgumentException.class);

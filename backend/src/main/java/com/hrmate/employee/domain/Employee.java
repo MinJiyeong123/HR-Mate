@@ -34,6 +34,9 @@ import org.hibernate.type.SqlTypes;
 public class Employee {
 
     public static final int EMPLOYEE_NO_MAX_LENGTH = 20;
+    /** 사번 형식 오류 문구. 등록 요청 검증(ValidationPatterns)도 이 문구를 사용한다. */
+    public static final String EMPLOYEE_NO_FORMAT_MESSAGE =
+            "사번은 공백 없이 영문·숫자 " + EMPLOYEE_NO_MAX_LENGTH + "자 이내로 입력해 주세요.";
     private static final Pattern EMPLOYEE_NO_PATTERN = Pattern.compile("^[A-Z0-9]{1," + EMPLOYEE_NO_MAX_LENGTH + "}$");
 
     @Id
@@ -110,8 +113,7 @@ public class Employee {
         requireNonNull(employeeNo, "사번");
         String normalized = employeeNo.toUpperCase(Locale.ROOT);
         if (!EMPLOYEE_NO_PATTERN.matcher(normalized).matches()) {
-            throw new IllegalArgumentException(
-                    "사번은 공백 없이 영문·숫자 " + EMPLOYEE_NO_MAX_LENGTH + "자 이내로 입력해야 합니다.");
+            throw new IllegalArgumentException(EMPLOYEE_NO_FORMAT_MESSAGE);
         }
         return normalized;
     }

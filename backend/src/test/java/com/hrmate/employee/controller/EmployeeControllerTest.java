@@ -129,7 +129,7 @@ class EmployeeControllerTest {
         mockMvc.perform(post("/api/employees").contentType(MediaType.APPLICATION_JSON).content(body))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("INVALID_INPUT"))
-                .andExpect(jsonPath("$.fieldErrors", hasKey("employeeNo")))
+                .andExpect(jsonPath("$.fieldErrors.employeeNo").value("사번은 공백 없이 영문·숫자 20자 이내로 입력해 주세요."))
                 .andExpect(jsonPath("$.fieldErrors.name").value("이름을 입력해 주세요."))
                 .andExpect(jsonPath("$.fieldErrors.hireDate").value("입사일을 입력해 주세요."))
                 .andExpect(jsonPath("$.fieldErrors", hasKey("phone")))
