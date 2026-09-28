@@ -857,6 +857,283 @@ a.sidebar__link:hover {
   gap: 8px;
 }
 
+/* ---------- 급여 입력 폼 ---------- */
+.form-section__sub {
+  margin-left: 6px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-text-subtle);
+}
+
+.amount-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 40px;
+}
+
+.amount-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 200px);
+  align-items: center;
+  gap: 4px 12px;
+  padding: 6px 0;
+}
+
+.amount-row__label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.amount-row__error {
+  grid-column: 1 / -1;
+  text-align: right;
+}
+
+.amount-row--error .input {
+  border-color: var(--color-danger);
+}
+
+.tax-tag {
+  padding: 0 6px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 999px;
+}
+
+.tax-tag--taxable {
+  color: var(--color-neutral);
+  background: var(--color-neutral-soft);
+}
+
+.tax-tag--free {
+  color: var(--color-success);
+  background: var(--color-success-soft);
+}
+
+.amount-input {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.amount-input__field {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.amount-input__unit {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.totals {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  padding: 14px 16px;
+  font-variant-numeric: tabular-nums;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-small);
+}
+
+.totals__net strong {
+  font-size: 18px;
+  color: var(--color-primary);
+}
+
+.totals--error {
+  border-color: var(--color-danger);
+  background: var(--color-danger-soft);
+}
+
+.totals--error .totals__net strong {
+  color: var(--color-danger);
+}
+
+.totals__error {
+  margin-top: 8px;
+}
+
+.detail-grid--four {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+/* ---------- 급여명세서 ---------- */
+.payslip {
+  padding: 28px 32px;
+}
+
+.payslip__header {
+  padding-bottom: 16px;
+  text-align: center;
+  border-bottom: 2px solid var(--color-text);
+}
+
+.payslip__title {
+  font-size: 22px;
+  letter-spacing: 0.3em;
+}
+
+.payslip__title-sub {
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--color-text-muted);
+}
+
+.payslip__meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 14px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.payslip__employee {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.payslip__employee dt {
+  font-size: 12px;
+  color: var(--color-text-subtle);
+}
+
+.payslip__employee dd {
+  margin: 2px 0 0;
+  font-weight: 600;
+}
+
+.payslip__columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  padding: 20px 0;
+}
+
+.payslip__column-title {
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.payslip__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.payslip__table th,
+.payslip__table td {
+  padding: 8px 4px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.payslip__table th {
+  font-weight: 500;
+  text-align: left;
+}
+
+.payslip__table td {
+  text-align: right;
+}
+
+.payslip__table tfoot th,
+.payslip__table tfoot td {
+  font-weight: 700;
+  border-top: 2px solid var(--color-border-strong);
+  border-bottom: none;
+}
+
+.payslip__tax {
+  font-size: 12px;
+  color: var(--color-text-subtle);
+}
+
+.payslip__empty {
+  color: var(--color-text-subtle);
+  text-align: center !important;
+}
+
+.payslip__net {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: var(--color-primary-soft);
+  border-radius: var(--radius-small);
+}
+
+.payslip__net strong {
+  font-size: 24px;
+  color: var(--color-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.payslip__memo {
+  margin-top: 14px;
+  color: var(--color-text-muted);
+}
+
+.payslip__notice {
+  margin-top: 20px;
+  padding-top: 12px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  border-top: 1px dashed var(--color-border-strong);
+}
+
+/* ---------- 인쇄: 명세서만 출력 ---------- */
+@media print {
+  @page {
+    size: A4;
+    margin: 15mm;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  .sidebar,
+  .demo-banner,
+  .page-header,
+  .alert,
+  .dialog {
+    display: none !important;
+  }
+
+  .app-content {
+    max-width: none;
+    padding: 0;
+  }
+
+  .payslip {
+    border: none;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .payslip__net {
+    border: 1px solid #999;
+    background: none;
+  }
+
+  .badge {
+    border: 1px solid currentColor;
+  }
+}
+
 /* ---------- 빈 화면 ---------- */
 .empty-state {
   display: flex;
@@ -918,7 +1195,17 @@ a.sidebar__link:hover {
     grid-template-columns: 1fr;
   }
 
-  .stats--four {
+  .stats--four,
+  .detail-grid--four {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .amount-columns,
+  .payslip__columns {
+    grid-template-columns: 1fr;
+  }
+
+  .payslip__employee {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

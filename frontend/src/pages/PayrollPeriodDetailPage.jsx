@@ -171,9 +171,14 @@ export default function PayrollPeriodDetailPage() {
                 확정 취소
               </button>
             ) : (
-              <button type="button" className="button button--primary" onClick={() => setDialog('confirm')}>
-                확정
-              </button>
+              <>
+                <Link to={`/payroll/${period.id}/payrolls/new`} className="button button--secondary">
+                  + 급여 입력
+                </Link>
+                <button type="button" className="button button--primary" onClick={() => setDialog('confirm')}>
+                  확정
+                </button>
+              </>
             )}
           </>
         }
@@ -267,7 +272,7 @@ export default function PayrollPeriodDetailPage() {
       <section className="card">
         <div className="card__header">
           <h2 className="card__title">사원별 급여</h2>
-          <span className="card__meta">입력 당시 사원 정보 기준 · 사번 순</span>
+          <span className="card__meta">입력 당시 사원 정보 기준 · 사번 순 · 행을 누르면 급여명세서</span>
         </div>
         <div className="table-wrap">
           <table className="table">
@@ -287,14 +292,22 @@ export default function PayrollPeriodDetailPage() {
                 <tr>
                   <td colSpan={7} className="table__empty">
                     <p>아직 입력된 급여가 없습니다.</p>
-                    <p className="table__sub-note">급여 입력 화면은 다음 단계(2-5)에서 추가됩니다.</p>
+                    {!confirmed && (
+                      <Link to={`/payroll/${period.id}/payrolls/new`} className="button button--secondary table__retry">
+                        + 급여 입력
+                      </Link>
+                    )}
                   </td>
                 </tr>
               )}
               {period.payrolls.map((payroll) => (
-                <tr key={payroll.id}>
+                <tr key={payroll.id} className="table__row--link" onClick={() => navigate(`/payrolls/${payroll.id}`)}>
                   <td className="table__mono">{payroll.employeeNo}</td>
-                  <td className="table__strong">{payroll.employeeName}</td>
+                  <td className="table__strong">
+                    <Link to={`/payrolls/${payroll.id}`} className="table__link" onClick={(e) => e.stopPropagation()}>
+                      {payroll.employeeName}
+                    </Link>
+                  </td>
                   <td>{display(payroll.department)}</td>
                   <td>{display(payroll.position)}</td>
                   <td className="table__number">{formatWon(payroll.totalEarnings)}</td>

@@ -40,7 +40,7 @@ Windows PowerShell 기준입니다. **터미널 2개**를 열어 백엔드 → �
 
 ### 1. 백엔드 (터미널 1)
 
-API 명세: [사원 API](docs/api/employee-api.md), [급여 API](docs/api/payroll-api.md) (급여는 포트폴리오용 시뮬레이션. 급여 기간 목록·만들기·상세 화면 제공, 급여 입력·명세서 화면은 준비 중)
+API 명세: [사원 API](docs/api/employee-api.md), [급여 API](docs/api/payroll-api.md) (급여는 포트폴리오용 시뮬레이션: 급여 기간 목록·만들기·상세·확정, 급여 입력·수정·삭제, 급여명세서 보기·인쇄. 세금·보험료는 직접 입력하며 자동 계산하지 않음)
 
 사전 준비: [docs/setup-database.md](docs/setup-database.md)대로 `hr_mate` DB와 `hrmate_app` 계정을 만듭니다.
 
