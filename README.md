@@ -6,6 +6,7 @@
 > - 이 프로젝트는 **가상의 직원 데이터만** 사용합니다. 실제 개인정보를 입력하지 마세요.
 > - 실제 급여 지급이나 세무 신고에 사용할 수 있는 **공식 시스템이 아닙니다.**
 > - 급여·연말정산 계산 결과는 계산 규칙이 공식 기준으로 검증되기 전까지 **시뮬레이션(포트폴리오용) 결과**입니다.
+> - 연말정산은 2025년 귀속 규칙(소득세법·국세청 안내 조사 기준)으로 계산한 **모의 계산**입니다. 전문가 검증 전이며, 지방소득세는 포함하지 않고, 일부 계산 방식은 가정입니다. 공식 연말정산 결과가 아닙니다.
 
 ## 기술 스택
 
@@ -22,9 +23,10 @@
 | 1차 | 직원 정보 관리 — 등록, 목록, 상세 조회, 수정, 퇴사 처리, 논리적 삭제 | 완료 |
 | 2차 | 월별 급여 관리 — 급여 기간, 급여 입력·수정·삭제, 확정, 급여명세서·인쇄 (시뮬레이션) | 완료 |
 | 3차 | 연간 급여 집계 — 귀속 연도 기준, 확정된 기간만 합산, 사원별 월별 내역 (시뮬레이션, 전문가 검증 전) | 완료 |
-| 추후 | 연말정산 자료 입력 → 연말정산 계산 및 결과 확인 | 예정 |
+| 4차 | 연말정산 모의 계산 — 사원·연도별 입력 자료(인원 수·해당 여부만, 개인 식별 정보 없음), 확정 급여 합계로 근로소득공제·인적공제·보험료/연금보험료 공제·기본세율·근로소득/자녀/표준세액공제 계산, 기납부세액과 비교해 추가 납부/환급 표시 (모의 계산, 2025년 귀속 규칙, 전문가 검증 전, 지방소득세 미포함) | 완료 |
+| 추후 후보 | 이번 범위에서 제외한 공제(신용카드·의료비·교육비·기부금·월세 등), 2026년 이후 귀속 규칙, 지방소득세 | 미정 |
 
-규칙 문서: [1차 요구사항](docs/requirements-mvp1.md), [급여 요구사항(2·3차)](docs/requirements-payroll.md), [근로소득 귀속연도 조사](docs/tax-rules/income-attribution.md)
+규칙 문서: [1차 요구사항](docs/requirements-mvp1.md), [급여 요구사항(2·3차)](docs/requirements-payroll.md), [근로소득 귀속연도 조사](docs/tax-rules/income-attribution.md), [연말정산 요구사항(4차)](docs/requirements-year-end.md), [연말정산 계산 규칙 조사(2025년 귀속)](docs/tax-rules/year-end-settlement-2025.md)
 
 ## 폴더 구조
 
@@ -33,7 +35,7 @@ HR-Mate/
 ├─ README.md
 ├─ CLAUDE.md            개발 지침
 ├─ docs/                요구사항, API 명세, 세법 조사, 진행 기록
-├─ backend/             Spring Boot 서버 (사원·급여 API)
+├─ backend/             Spring Boot 서버 (사원·급여·연말정산 API)
 └─ frontend/            React 화면 (백엔드 API와 연결)
 ```
 
@@ -44,7 +46,7 @@ Windows PowerShell 기준입니다. **터미널 2개**를 열어 백엔드 → �
 
 ### 1. 백엔드 (터미널 1)
 
-API 명세: [사원 API](docs/api/employee-api.md), [급여 API](docs/api/payroll-api.md) (급여는 포트폴리오용 시뮬레이션: 급여 기간 목록·만들기·상세·확정, 급여 입력·수정·삭제, 급여명세서 보기·인쇄, 연간 급여 집계. 세금·보험료는 직접 입력하며 자동 계산하지 않음. 연간 집계 기준은 [귀속연도 조사](docs/tax-rules/income-attribution.md) 참고)
+API 명세: [사원 API](docs/api/employee-api.md), [급여 API](docs/api/payroll-api.md) (급여는 포트폴리오용 시뮬레이션: 급여 기간 목록·만들기·상세·확정, 급여 입력·수정·삭제, 급여명세서 보기·인쇄, 연간 급여 집계. 세금·보험료는 직접 입력하며 자동 계산하지 않음. 연간 집계 기준은 [귀속연도 조사](docs/tax-rules/income-attribution.md) 참고), [연말정산 API](docs/api/year-end-api.md) (모의 계산: 목록, 입력 자료 조회·저장, 계산 결과)
 
 사전 준비: [docs/setup-database.md](docs/setup-database.md)대로 `hr_mate` DB와 `hrmate_app` 계정을 만듭니다.
 
@@ -115,7 +117,7 @@ npm run dev
 시연용 가상 사원 12명(재직 10, 퇴사 2)을 개발 DB에 넣을 수 있습니다.
 
 - 파일: [docs/sample-data/sample-employees.sql](docs/sample-data/sample-employees.sql)
-- 넣는 방법과 시연 순서: [docs/demo-guide.md](docs/demo-guide.md) (사원 관리 시연, 급여 관리·연간 급여 집계 시연 시나리오, 주의사항, 문제 해결 포함)
+- 넣는 방법과 시연 순서: [docs/demo-guide.md](docs/demo-guide.md) (사원 관리 시연, 급여 관리·연간 급여 집계·연말정산 모의 계산 시연 시나리오, 주의사항, 문제 해결 포함)
 - 모든 인물·연락처는 가상입니다. 이메일은 `example.com`만 사용하고 전화번호는 비워 둡니다.
 - 추가(INSERT)만 하며 여러 번 실행해도 중복되지 않습니다. 초기화는 필요 없습니다.
 - 한 번 넣은 데이터는 되돌리기 어려우니 내용을 확인한 뒤 실행하세요.
