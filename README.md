@@ -44,6 +44,8 @@ HR-Mate/
 Windows PowerShell 기준입니다. **터미널 2개**를 열어 백엔드 → 프론트엔드 순서로 실행합니다.
 화면(5173)의 `/api` 요청은 Vite 프록시가 백엔드(8080)로 전달합니다.
 
+> 아래 명령의 `C:\work\HR-Mate`는 예시 경로입니다. 저장소를 받은 실제 폴더 경로로 바꿔 입력하세요.
+
 ### 1. 백엔드 (터미널 1)
 
 API 명세: [사원 API](docs/api/employee-api.md), [급여 API](docs/api/payroll-api.md) (급여는 포트폴리오용 시뮬레이션: 급여 기간 목록·만들기·상세·확정, 급여 입력·수정·삭제, 급여명세서 보기·인쇄, 연간 급여 집계. 세금·보험료는 직접 입력하며 자동 계산하지 않음. 연간 집계 기준은 [귀속연도 조사](docs/tax-rules/income-attribution.md) 참고), [연말정산 API](docs/api/year-end-api.md) (모의 계산: 목록, 입력 자료 조회·저장, 계산 결과)
@@ -53,7 +55,7 @@ API 명세: [사원 API](docs/api/employee-api.md), [급여 API](docs/api/payrol
 1. 로컬 설정 파일을 만듭니다. (처음 한 번)
 
    ```powershell
-   cd C:\Users\ADMIN\Desktop\HR-Mate
+   cd C:\work\HR-Mate
    Copy-Item backend\src\main\resources\application-local.yml.example backend\src\main\resources\application-local.yml
    ```
 
@@ -63,7 +65,7 @@ API 명세: [사원 API](docs/api/employee-api.md), [급여 API](docs/api/payrol
 3. 서버를 실행합니다.
 
    ```powershell
-   cd C:\Users\ADMIN\Desktop\HR-Mate\backend
+   cd C:\work\HR-Mate\backend
    .\gradlew.bat bootRun
    ```
 
@@ -75,7 +77,7 @@ API 명세: [사원 API](docs/api/employee-api.md), [급여 API](docs/api/payrol
 처음 한 번만 라이브러리를 설치합니다.
 
 ```powershell
-cd C:\Users\ADMIN\Desktop\HR-Mate\frontend
+cd C:\work\HR-Mate\frontend
 npm install
 ```
 
@@ -106,7 +108,7 @@ npm run dev
 3. `1`이 나오면 백엔드가 Gradle 데몬(백그라운드 도우미) 아래에 남아 있는 것입니다. Gradle 데몬을 멈추고 2번을 다시 확인합니다.
 
    ```powershell
-   cd C:\Users\ADMIN\Desktop\HR-Mate\backend
+   cd C:\work\HR-Mate\backend
    .\gradlew.bat --stop
    ```
 
@@ -128,7 +130,7 @@ npm run dev
 처음 한 번 [docs/setup-test-database.md](docs/setup-test-database.md)대로 테스트 DB·계정과 `application-test-local.yml`을 준비합니다.
 
 ```powershell
-cd C:\Users\ADMIN\Desktop\HR-Mate\backend
+cd C:\work\HR-Mate\backend
 .\gradlew.bat test
 ```
 

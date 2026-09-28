@@ -61,8 +61,10 @@ SHOW DATABASES;
 
 ## 4. 테스트 비밀번호 파일 만들기
 
+아래 명령의 `C:\work\HR-Mate`는 예시 경로입니다. 저장소를 받은 실제 폴더 경로로 바꿔 입력하세요.
+
 ```powershell
-cd C:\Users\ADMIN\Desktop\HR-Mate
+cd C:\work\HR-Mate
 Copy-Item backend\src\test\resources\application-test-local.yml.example backend\src\test\resources\application-test-local.yml
 ```
 
@@ -71,7 +73,7 @@ Copy-Item backend\src\test\resources\application-test-local.yml.example backend\
 ## 5. 테스트 실행과 확인
 
 ```powershell
-cd C:\Users\ADMIN\Desktop\HR-Mate\backend
+cd C:\work\HR-Mate\backend
 .\gradlew.bat test
 ```
 
