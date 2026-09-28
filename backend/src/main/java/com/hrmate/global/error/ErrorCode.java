@@ -18,6 +18,7 @@ public enum ErrorCode {
     INVALID_PAYROLL_PERIOD_STATE(HttpStatus.CONFLICT, "급여 기간 상태를 확인해 주세요."),
     PAYROLL_NOT_FOUND(HttpStatus.NOT_FOUND, "급여 정보를 찾을 수 없습니다."),
     PAYROLL_DUPLICATED(HttpStatus.CONFLICT, "이 기간에 이미 급여가 입력된 사원입니다."),
+    YEAR_END_INPUT_LOCKED(HttpStatus.CONFLICT, "삭제된 사원의 연말정산 자료는 저장할 수 없습니다."),
     INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "요청을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.");
 
     private final HttpStatus status;
