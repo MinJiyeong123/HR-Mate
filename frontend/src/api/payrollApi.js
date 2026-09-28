@@ -2,13 +2,14 @@
 // 급여 API 호출 (백엔드 명세: docs/api/payroll-api.md) - 포트폴리오용 시뮬레이션
 // - 화면(pages, components)은 이 파일의 함수만 사용한다.
 // - 요청 본문에는 API 명세에 정의된 항목만 담는다.
-// - 급여 기간(목록·생성·상세·지급일 수정·확정·확정 취소), 항목, 급여(입력·조회·수정·삭제)
+// - 급여 기간(목록·생성·상세·지급일 수정·확정·확정 취소), 항목, 급여(입력·조회·수정·삭제), 연간 집계(조회)
 // ------------------------------------------------------------------
 
 import { request } from './client'
 
 const PERIOD_URL = '/api/payroll-periods'
 const PAYROLL_URL = '/api/payrolls'
+const ANNUAL_URL = '/api/payroll-summaries/annual'
 
 function payrollPath(id) {
   return `${PAYROLL_URL}/${encodeURIComponent(id)}`
@@ -84,4 +85,14 @@ export function confirmPayrollPeriod(id) {
 /** 확정 취소 */
 export function reopenPayrollPeriod(id) {
   return request(`${periodPath(id)}/reopen`, { method: 'POST' })
+}
+
+/** 연간 급여 집계 (귀속 연도 기준, 확정된 기간만) */
+export function getAnnualPayrollSummary(year) {
+  return request(`${ANNUAL_URL}?year=${encodeURIComponent(year)}`)
+}
+
+/** 사원별 연간 급여 상세 (월별 내역·항목별 합계, 삭제된 사원도 조회) */
+export function getEmployeeAnnualPayroll(employeeId, year) {
+  return request(`${ANNUAL_URL}/employees/${encodeURIComponent(employeeId)}?year=${encodeURIComponent(year)}`)
 }

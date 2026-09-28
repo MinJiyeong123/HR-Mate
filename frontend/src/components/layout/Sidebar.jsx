@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 
 function UsersIcon() {
   return (
@@ -28,10 +28,22 @@ function DocumentIcon() {
   )
 }
 
+function ChartIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 20h16M7 16v-5M12 16V7M17 16v-8" />
+    </svg>
+  )
+}
+
 // 연말정산은 추후 단계에서 구현한다. 지금은 메뉴 위치만 보여 준다.
 const UPCOMING_MENUS = [{ label: '연말정산', icon: <DocumentIcon /> }]
 
 export default function Sidebar() {
+  // 연간 급여 집계(/payroll/annual)에서는 "급여 관리" 대신 "연간 급여 집계"만 강조한다.
+  const { pathname } = useLocation()
+  const annualActive = pathname.startsWith('/payroll/annual')
+
   return (
     <aside className="sidebar">
       <div className="sidebar__brand">
@@ -50,9 +62,16 @@ export default function Sidebar() {
         </NavLink>
 
         <p className="sidebar__section">급여 · 세무</p>
-        <NavLink to="/payroll" className="sidebar__link">
+        <NavLink
+          to="/payroll"
+          className={({ isActive }) => `sidebar__link${isActive && !annualActive ? ' active' : ''}`}
+        >
           <WalletIcon />
           급여 관리
+        </NavLink>
+        <NavLink to="/payroll/annual" className="sidebar__link">
+          <ChartIcon />
+          연간 급여 집계
         </NavLink>
         {UPCOMING_MENUS.map((menu) => (
           <span key={menu.label} className="sidebar__link sidebar__link--disabled" aria-disabled="true">
