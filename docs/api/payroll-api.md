@@ -25,7 +25,7 @@
 | 10 | `GET /api/payrolls/{id}` | 급여명세서 | 200 | 404 |
 | 11 | `PUT /api/payrolls/{id}` | 급여 수정 (작성 중만) | 200 | 400, 404, 409 |
 | 12 | `DELETE /api/payrolls/{id}` | 급여 삭제 (작성 중만, 실제 삭제) | 204 | 404, 409 |
-| 13 | `GET /api/employees/{id}/payrolls?year=` | 사원별 연간 급여 내역 | 200 | 400, 404 |
+| 13 | `GET /api/employees/{id}/payrolls?year=` | 사원별 연간 급여 내역 (현재 화면 미사용) | 200 | 400, 404 |
 | 14 | `GET /api/payroll-summaries/annual?year=` | 연간 급여 집계 (3차, 확정 기간만) | 200 | 400 |
 | 15 | `GET /api/payroll-summaries/annual/employees/{id}?year=` | 사원별 연간 급여 상세 (3차, 확정 기간만) | 200 | 400, 404 |
 
@@ -191,6 +191,7 @@
 - `400 INVALID_INPUT`: `fieldErrors.year`(누락 또는 2000~2100 밖)
 - `404 EMPLOYEE_NOT_FOUND`: 없거나 논리 삭제된 사원 (급여 기록 자체는 삭제되지 않고 기간 상세에 남음)
 - 작성 중·확정 기간을 모두 포함합니다. 확정된 급여만 합산한 값은 14·15를 사용합니다.
+- **현재 화면 미사용**: 프론트엔드에서 호출하지 않습니다(2026-09-29 확인). API와 테스트는 유지합니다. 화면의 사원별 연간 내역은 15번을 사용합니다.
 
 ## 연간 급여 집계 (14·15) 공통 규칙
 
