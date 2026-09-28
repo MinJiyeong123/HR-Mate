@@ -17,10 +17,14 @@
 
 ## 개발 범위
 
-- **1차 MVP (진행 중)**: 직원 정보 관리 — 등록, 목록, 상세 조회, 수정, 퇴사 처리, 논리적 삭제
-- **추후 단계**: 월별 급여 관리 → 연간 급여 집계 → 연말정산 자료 입력 → 연말정산 계산 및 결과 확인
+| 단계 | 내용 | 상태 |
+|---|---|---|
+| 1차 | 직원 정보 관리 — 등록, 목록, 상세 조회, 수정, 퇴사 처리, 논리적 삭제 | 완료 |
+| 2차 | 월별 급여 관리 — 급여 기간, 급여 입력·수정·삭제, 확정, 급여명세서·인쇄 (시뮬레이션) | 완료 |
+| 3차 | 연간 급여 집계 — 귀속 연도 기준, 확정된 기간만 합산, 사원별 월별 내역 (시뮬레이션, 전문가 검증 전) | 완료 |
+| 추후 | 연말정산 자료 입력 → 연말정산 계산 및 결과 확인 | 예정 |
 
-1차 MVP의 확정 규칙은 [docs/requirements-mvp1.md](docs/requirements-mvp1.md)에 정리되어 있습니다.
+규칙 문서: [1차 요구사항](docs/requirements-mvp1.md), [급여 요구사항(2·3차)](docs/requirements-payroll.md), [근로소득 귀속연도 조사](docs/tax-rules/income-attribution.md)
 
 ## 폴더 구조
 
@@ -28,8 +32,8 @@
 HR-Mate/
 ├─ README.md
 ├─ CLAUDE.md            개발 지침
-├─ docs/                요구사항, 진행 기록
-├─ backend/             Spring Boot 서버 (사원 API)
+├─ docs/                요구사항, API 명세, 세법 조사, 진행 기록
+├─ backend/             Spring Boot 서버 (사원·급여 API)
 └─ frontend/            React 화면 (백엔드 API와 연결)
 ```
 
@@ -40,7 +44,7 @@ Windows PowerShell 기준입니다. **터미널 2개**를 열어 백엔드 → �
 
 ### 1. 백엔드 (터미널 1)
 
-API 명세: [사원 API](docs/api/employee-api.md), [급여 API](docs/api/payroll-api.md) (급여는 포트폴리오용 시뮬레이션: 급여 기간 목록·만들기·상세·확정, 급여 입력·수정·삭제, 급여명세서 보기·인쇄. 세금·보험료는 직접 입력하며 자동 계산하지 않음)
+API 명세: [사원 API](docs/api/employee-api.md), [급여 API](docs/api/payroll-api.md) (급여는 포트폴리오용 시뮬레이션: 급여 기간 목록·만들기·상세·확정, 급여 입력·수정·삭제, 급여명세서 보기·인쇄, 연간 급여 집계. 세금·보험료는 직접 입력하며 자동 계산하지 않음. 연간 집계 기준은 [귀속연도 조사](docs/tax-rules/income-attribution.md) 참고)
 
 사전 준비: [docs/setup-database.md](docs/setup-database.md)대로 `hr_mate` DB와 `hrmate_app` 계정을 만듭니다.
 
@@ -62,6 +66,7 @@ API 명세: [사원 API](docs/api/employee-api.md), [급여 API](docs/api/payrol
    ```
 
    로그에 `Started HrMateApplication`이 나오면 성공입니다. 종료는 `Ctrl + C`.
+   실행한 터미널은 닫지 말고 그대로 둡니다. 코드가 바뀐 뒤에는 아래 [백엔드 다시 켜기](#백엔드-다시-켜기)를 따릅니다.
 
 ### 2. 프론트엔드 (터미널 2)
 
@@ -84,12 +89,33 @@ npm run dev
 - 삭제는 논리 삭제라 삭제한 사원의 사번은 다시 사용할 수 없습니다.
 - 백엔드가 꺼져 있으면 화면에 "서버에 연결할 수 없습니다" 안내가 나옵니다.
 
+### 백엔드 다시 켜기
+
+백엔드는 **켤 때의 코드로 계속 동작**합니다. 코드를 받거나 바꾼 뒤에는 한 번 끄고 다시 켜야 새 기능이 반영됩니다.
+(예: 새 화면에 "–"만 보이거나 새 기능이 "찾을 수 없습니다"로 나올 때)
+
+1. 백엔드를 실행한 터미널에서 `Ctrl + C`로 끕니다. (`일괄 작업을 끝내시겠습니까 (Y/N)?`가 나오면 `Y`)
+2. 꺼졌는지 확인합니다. 결과가 `0`이면 8080 포트가 비어 있는 것입니다.
+
+   ```powershell
+   @(Get-NetTCPConnection -LocalPort 8080 -State Listen -ErrorAction SilentlyContinue).Count
+   ```
+
+3. `1`이 나오면 백엔드가 Gradle 데몬(백그라운드 도우미) 아래에 남아 있는 것입니다. Gradle 데몬을 멈추고 2번을 다시 확인합니다.
+
+   ```powershell
+   cd C:\Users\ADMIN\Desktop\HR-Mate\backend
+   .\gradlew.bat --stop
+   ```
+
+4. `.\gradlew.bat bootRun`으로 다시 실행합니다. 새 마이그레이션이 없으면 DB 데이터는 바뀌지 않습니다.
+
 ## 데모 데이터와 시연
 
 시연용 가상 사원 12명(재직 10, 퇴사 2)을 개발 DB에 넣을 수 있습니다.
 
 - 파일: [docs/sample-data/sample-employees.sql](docs/sample-data/sample-employees.sql)
-- 넣는 방법과 시연 순서: [docs/demo-guide.md](docs/demo-guide.md) (사원 관리 시연, 급여 관리 시연 시나리오와 주의사항 포함)
+- 넣는 방법과 시연 순서: [docs/demo-guide.md](docs/demo-guide.md) (사원 관리 시연, 급여 관리·연간 급여 집계 시연 시나리오, 주의사항, 문제 해결 포함)
 - 모든 인물·연락처는 가상입니다. 이메일은 `example.com`만 사용하고 전화번호는 비워 둡니다.
 - 추가(INSERT)만 하며 여러 번 실행해도 중복되지 않습니다. 초기화는 필요 없습니다.
 - 한 번 넣은 데이터는 되돌리기 어려우니 내용을 확인한 뒤 실행하세요.
