@@ -904,6 +904,146 @@ a.sidebar__link:hover {
   margin-top: 16px;
 }
 
+/* ---------- 연말정산 (모의 계산) ---------- */
+.badge--inline {
+  margin-left: 8px;
+}
+
+.balance {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.balance--pay {
+  color: var(--color-danger);
+}
+
+.balance--refund {
+  color: var(--color-success);
+}
+
+.calc-table .calc-table__step {
+  width: 56px;
+  color: var(--color-text-subtle);
+  text-align: center;
+}
+
+.calc-table tbody th {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+  background: none;
+}
+
+.calc-table__detail,
+.calc-table__note {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-text-subtle);
+  white-space: normal;
+}
+
+.calc-table__note {
+  color: var(--color-warning-text);
+}
+
+.calc-table__sign {
+  margin-right: 6px;
+  color: var(--color-text-subtle);
+}
+
+.calc-table__subtotal th,
+.calc-table__subtotal td {
+  font-weight: 700 !important;
+  background: var(--color-surface-muted) !important;
+}
+
+.yearend-warnings ul,
+.yearend-assumptions {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.yearend-assumptions {
+  padding: 12px 20px 16px 38px;
+  color: var(--color-text-muted);
+}
+
+.yearend-warnings li + li,
+.yearend-assumptions li + li {
+  margin-top: 4px;
+}
+
+/* ---------- 인원 선택 드롭다운 (CountDropdown) ---------- */
+.count-dropdown {
+  position: relative;
+}
+
+.count-dropdown__button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+  cursor: pointer;
+}
+
+.count-dropdown__button:disabled {
+  cursor: not-allowed;
+}
+
+.count-dropdown__button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+
+.count-dropdown__chevron {
+  font-size: 12px;
+  color: var(--color-text-subtle);
+}
+
+.count-dropdown__list {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  max-height: 240px; /* CountDropdown MAX_LIST_HEIGHT 과 같게 유지 */
+  margin: 0;
+  padding: 4px 0;
+  overflow-y: auto;
+  list-style: none;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-small);
+  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.16);
+}
+
+.count-dropdown__list--bottom {
+  top: calc(100% + 4px);
+}
+
+.count-dropdown__list--top {
+  bottom: calc(100% + 4px);
+}
+
+.count-dropdown__option {
+  display: flex;
+  align-items: center;
+  min-height: 40px; /* 터치 영역, CountDropdown OPTION_HEIGHT 과 같게 유지 */
+  padding: 0 12px;
+  cursor: pointer;
+}
+
+.count-dropdown__option--active {
+  background: var(--color-primary-soft);
+}
+
+.count-dropdown__option[aria-selected='true'] {
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
 /* ---------- 급여 입력 폼 ---------- */
 .form-section__sub {
   margin-left: 6px;

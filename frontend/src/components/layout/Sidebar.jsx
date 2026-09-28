@@ -36,9 +36,6 @@ function ChartIcon() {
   )
 }
 
-// 연말정산은 추후 단계에서 구현한다. 지금은 메뉴 위치만 보여 준다.
-const UPCOMING_MENUS = [{ label: '연말정산', icon: <DocumentIcon /> }]
-
 export default function Sidebar() {
   // 연간 급여 집계(/payroll/annual)에서는 "급여 관리" 대신 "연간 급여 집계"만 강조한다.
   const { pathname } = useLocation()
@@ -73,13 +70,10 @@ export default function Sidebar() {
           <ChartIcon />
           연간 급여 집계
         </NavLink>
-        {UPCOMING_MENUS.map((menu) => (
-          <span key={menu.label} className="sidebar__link sidebar__link--disabled" aria-disabled="true">
-            {menu.icon}
-            {menu.label}
-            <span className="sidebar__tag">준비 중</span>
-          </span>
-        ))}
+        <NavLink to="/year-end" className="sidebar__link">
+          <DocumentIcon />
+          연말정산
+        </NavLink>
       </nav>
 
       {/* 진행 단계는 README에서 관리한다. 단계가 바뀌어도 고치지 않도록 고정 안내만 표시한다. */}

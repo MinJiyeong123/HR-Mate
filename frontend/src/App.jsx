@@ -13,6 +13,9 @@ import PayrollPeriodCreatePage from './pages/PayrollPeriodCreatePage'
 import PayrollPeriodDetailPage from './pages/PayrollPeriodDetailPage'
 import PayrollPeriodListPage from './pages/PayrollPeriodListPage'
 import PayslipPage from './pages/PayslipPage'
+import YearEndInputPage from './pages/YearEndInputPage'
+import YearEndListPage from './pages/YearEndListPage'
+import YearEndResultPage from './pages/YearEndResultPage'
 
 export default function App() {
   return (
@@ -32,6 +35,9 @@ export default function App() {
         <Route path="payroll/:periodId/payrolls/new" element={<PayrollCreatePage />} />
         <Route path="payroll/:periodId/payrolls/:payrollId/edit" element={<PayrollEditPage />} />
         <Route path="payrolls/:payrollId" element={<PayslipPage />} />
+        <Route path="year-end" element={<YearEndListPage />} />
+        <Route path="year-end/employees/:employeeId" element={<YearEndResultPage />} />
+        <Route path="year-end/employees/:employeeId/input" element={<YearEndInputPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
