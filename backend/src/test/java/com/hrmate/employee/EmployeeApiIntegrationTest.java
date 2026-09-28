@@ -14,12 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 사원 API 통합 테스트: API → 서비스 → JPA → 로컬 MariaDB(hr_mate)
+ * 사원 API 통합 테스트: API → 서비스 → JPA → 테스트 DB(hr_mate_test, test 프로필)
  *
  * 데이터 안전
  * - 각 테스트 메서드는 @Transactional 트랜잭션 안에서 실행되고, 끝나면 항상 롤백된다.
@@ -32,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
+@ActiveProfiles("test")
 @TestPropertySource(properties = "spring.jpa.hibernate.ddl-auto=validate")
 class EmployeeApiIntegrationTest {
 

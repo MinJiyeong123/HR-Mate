@@ -1,0 +1,22 @@
+# 테스트 전용 설정 (프로필: test)
+# - 테스트는 개발 DB(hr_mate)가 아닌 테스트 DB(hr_mate_test)에만 연결합니다.
+# - 테스트 계정(hrmate_test)은 hr_mate_test 에만 권한이 있습니다. (docs/setup-test-database.md)
+# - 비밀번호는 application-test-local.yml(Git 제외)에서 읽습니다. 파일이 없으면 접속이 거부되어 테스트가 실패합니다.
+# - 이 파일의 url 을 개발 DB(hr_mate)로 바꾸지 마세요.
+spring:
+  config:
+    import: optional:classpath:application-test-local.yml
+
+  datasource:
+    url: jdbc:mariadb://localhost:3306/hr_mate_test
+    username: hrmate_test
+    # password: application-test-local.yml 에서 설정
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+  flyway:
+    enabled: true
+    # 테스트 DB에도 Flyway 초기화(clean) 명령은 허용하지 않습니다.
+    clean-disabled: true

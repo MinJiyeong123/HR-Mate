@@ -3,6 +3,8 @@
     "deny": [
       "Read(application-local.yml)",
       "Edit(application-local.yml)",
+      "Read(application-test-local.yml)",
+      "Edit(application-test-local.yml)",
       "Read(.env)",
       "Edit(.env)",
       "Read(.env.*)",

@@ -84,6 +84,18 @@ npm run dev
 - 삭제는 논리 삭제라 삭제한 사원의 사번은 다시 사용할 수 없습니다.
 - 백엔드가 꺼져 있으면 화면에 "서버에 연결할 수 없습니다" 안내가 나옵니다.
 
+## 백엔드 테스트
+
+테스트는 개발 DB(`hr_mate`)가 아닌 테스트 전용 DB(`hr_mate_test`)에 연결합니다.
+처음 한 번 [docs/setup-test-database.md](docs/setup-test-database.md)대로 테스트 DB·계정과 `application-test-local.yml`을 준비합니다.
+
+```powershell
+cd C:\Users\ADMIN\Desktop\HR-Mate\backend
+.\gradlew.bat test
+```
+
+테스트 비밀번호 파일이 없거나 비밀번호가 틀리면 DB 테스트가 실패합니다. 개발 DB로 대신 연결하지 않습니다.
+
 ## 진행 상황
 
 [docs/progress.md](docs/progress.md)를 참고하세요.

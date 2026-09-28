@@ -13,18 +13,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
 /**
  * employee 테이블(V1 마이그레이션)과 EmployeeRepository 검증
  *
- * - 로컬 MariaDB(hr_mate)에 접속한다. 테스트 DB 분리 방식은 5단계에서 정한다.
+ * - 테스트 DB(hr_mate_test, test 프로필)에 접속한다. 개발 DB(hr_mate)에는 접속하지 않는다.
  * - 각 테스트는 트랜잭션 안에서 실행되고 끝나면 롤백되어 데이터가 남지 않는다.
  * - 테이블을 만들거나 지우지 않도록 ddl-auto 를 validate 로 고정한다.
  * - 테스트용 사번은 ZZTEST 로 시작한다.
  */
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ActiveProfiles("test")
 @TestPropertySource(properties = "spring.jpa.hibernate.ddl-auto=validate")
 class EmployeeRepositoryTest {
 
