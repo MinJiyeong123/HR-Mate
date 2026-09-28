@@ -11,6 +11,7 @@ import com.hrmate.payroll.domain.Payroll;
 import com.hrmate.payroll.domain.PayrollLine;
 import com.hrmate.payroll.domain.PayrollLineInput;
 import com.hrmate.payroll.domain.PayrollPeriod;
+import com.hrmate.payroll.domain.PayrollPeriodStatus;
 import com.hrmate.payroll.domain.TaxType;
 import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
@@ -137,6 +138,36 @@ class PayrollRepositoryTest {
         assertThat(payrollRepository.findAllByEmployee_IdAndPeriod_PayYearOrderByPeriod_PayMonthAsc(employee.getId(), 2099))
                 .hasSize(1);
         assertThat(payrollPeriodRepository.existsByPayYearAndPayMonth(2099, 1)).isTrue();
+    }
+
+    @Test
+    void 연간_집계_조회는_귀속_연도와_기간_상태로_거르고_항목을_함께_읽는다() {
+        Employee first = employee("ZZPAY011");
+        Employee second = employee("ZZPAY012");
+        PayrollPeriod january = period(1);
+        PayrollPeriod february = period(2);
+        PayrollPeriod otherYear = payrollPeriodRepository.saveAndFlush(PayrollPeriod.create(2098, 1, LocalDate.of(2098, 1, 25)));
+        savePayroll(january, second, line("BASE_SALARY", 1_000));
+        savePayroll(january, first, line("BASE_SALARY", 2_000), line("MEAL_ALLOWANCE", 300));
+        savePayroll(february, first, line("BASE_SALARY", 2_000));
+        savePayroll(otherYear, first, line("BASE_SALARY", 9_000));
+        january.confirm(2);
+        otherYear.confirm(1);
+        payrollPeriodRepository.flush();
+        entityManager.clear();
+
+        List<Payroll> confirmed = payrollRepository.findAllForAnnual(2099, PayrollPeriodStatus.CONFIRMED);
+        assertThat(confirmed).extracting(Payroll::getEmployeeNo).containsExactly("ZZPAY011", "ZZPAY012");
+        assertThat(confirmed.get(0).getLines()).hasSize(2);
+        assertThat(payrollRepository.findAllForAnnual(2099, PayrollPeriodStatus.DRAFT))
+                .extracting(payroll -> payroll.getPeriod().getPayMonth()).containsExactly(2);
+
+        assertThat(payrollRepository.findAllForAnnualByEmployee(first.getId(), 2099, PayrollPeriodStatus.CONFIRMED))
+                .extracting(Payroll::getTotalEarnings).containsExactly(2_300L);
+        assertThat(payrollRepository.countByEmployee_IdAndPeriod_PayYearAndPeriod_Status(
+                first.getId(), 2099, PayrollPeriodStatus.DRAFT)).isEqualTo(1);
+        assertThat(payrollPeriodRepository.countByPayYearAndStatus(2099, PayrollPeriodStatus.CONFIRMED)).isEqualTo(1);
+        assertThat(payrollPeriodRepository.countByPayYearAndStatus(2099, PayrollPeriodStatus.DRAFT)).isEqualTo(1);
     }
 
     @Test

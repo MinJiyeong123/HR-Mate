@@ -26,6 +26,8 @@
 | 11 | `PUT /api/payrolls/{id}` | 급여 수정 (작성 중만) | 200 | 400, 404, 409 |
 | 12 | `DELETE /api/payrolls/{id}` | 급여 삭제 (작성 중만, 실제 삭제) | 204 | 404, 409 |
 | 13 | `GET /api/employees/{id}/payrolls?year=` | 사원별 연간 급여 내역 | 200 | 400, 404 |
+| 14 | `GET /api/payroll-summaries/annual?year=` | 연간 급여 집계 (3차, 확정 기간만) | 200 | 400 |
+| 15 | `GET /api/payroll-summaries/annual/employees/{id}?year=` | 사원별 연간 급여 상세 (3차, 확정 기간만) | 200 | 400, 404 |
 
 ## 1. 항목 목록 `GET /api/pay-items`
 
@@ -188,6 +190,81 @@
 - 월 순 정렬
 - `400 INVALID_INPUT`: `fieldErrors.year`(누락 또는 2000~2100 밖)
 - `404 EMPLOYEE_NOT_FOUND`: 없거나 논리 삭제된 사원 (급여 기록 자체는 삭제되지 않고 기간 상세에 남음)
+- 작성 중·확정 기간을 모두 포함합니다. 확정된 급여만 합산한 값은 14·15를 사용합니다.
+
+## 연간 급여 집계 (14·15) 공통 규칙
+
+> - **귀속 연도(`pay_year`) 기준**입니다. 귀속 월을 근로를 제공한 달로 간주합니다(전문가 검증 전). 지급일이 다음 해여도 귀속 연도에 합산합니다.
+> - **확정(CONFIRMED)된 기간의 급여만** 합산합니다. 작성 중 기간은 제외하고 그 수를 알려 줍니다.
+> - 과세·비과세는 급여 입력 당시 복사해 둔 항목의 과세 구분으로 나눕니다. 비과세 한도(예: 식대 월 20만원)는 검사하지 않습니다.
+> - 논리 삭제된 사원도 포함하고 `deleted: true`로 표시합니다.
+> - 포트폴리오용 시뮬레이션이며 공식 원천징수·연말정산 자료가 아닙니다. 기준 근거: [income-attribution.md](../tax-rules/income-attribution.md)
+
+- 조회할 때마다 계산하며 별도 저장 테이블은 없습니다.
+- `400 INVALID_INPUT`: `fieldErrors.year`(누락, 숫자가 아님, 2000~2100 밖)
+- 확정 급여가 없는 연도는 오류가 아니라 합계 0과 빈 목록입니다.
+
+합계 형식 `totals` (원):
+
+| 필드 | 의미 |
+|---|---|
+| totalEarnings | 지급 합계 (= taxableEarnings + nonTaxableEarnings) |
+| taxableEarnings | 과세 지급 합계 |
+| nonTaxableEarnings | 비과세 지급 합계 |
+| totalDeductions | 공제 합계 |
+| netPay | 실지급액 합계 |
+
+## 14. 연간 급여 집계 `GET /api/payroll-summaries/annual?year=2026`
+
+```json
+{
+  "year": 2026,
+  "confirmedPeriodCount": 2,
+  "excludedDraftPeriodCount": 1,
+  "totals": { "totalEarnings": 8400000, "taxableEarnings": 8000000, "nonTaxableEarnings": 400000,
+              "totalDeductions": 250000, "netPay": 8150000 },
+  "employees": [
+    { "employeeId": 2, "employeeNo": "E2019001", "employeeName": "김하늘", "department": "인사팀", "position": "과장",
+      "deleted": false, "payrollCount": 2,
+      "totals": { "totalEarnings": 6400000, "taxableEarnings": 6000000, "nonTaxableEarnings": 400000,
+                  "totalDeductions": 200000, "netPay": 6200000 } }
+  ]
+}
+```
+
+- `confirmedPeriodCount`: 합산한 확정 기간 수 / `excludedDraftPeriodCount`: 제외된 작성 중 기간 수
+- `employees`: 그 해 확정 급여가 있는 사원만, 사번 순
+- 이름·부서·직급은 **그 해 마지막 확정 급여에 복사해 둔 값**입니다. `deleted`는 현재 사원의 논리 삭제 여부입니다.
+
+## 15. 사원별 연간 급여 상세 `GET /api/payroll-summaries/annual/employees/{id}?year=2026`
+
+```json
+{
+  "year": 2026, "employeeId": 2, "employeeNo": "E2019001", "employeeName": "김하늘",
+  "department": "인사팀", "position": "과장", "deleted": false,
+  "excludedDraftPayrollCount": 1,
+  "totals": { "totalEarnings": 6500000, "taxableEarnings": 6100000, "nonTaxableEarnings": 400000,
+              "totalDeductions": 210000, "netPay": 6290000 },
+  "months": [
+    { "payrollId": 10, "month": 11, "paymentDate": "2026-11-25", "totalEarnings": 3200000,
+      "taxableEarnings": 3000000, "nonTaxableEarnings": 200000, "totalDeductions": 100000, "netPay": 3100000 },
+    { "payrollId": 14, "month": 12, "paymentDate": "2027-01-10", "totalEarnings": 3300000,
+      "taxableEarnings": 3100000, "nonTaxableEarnings": 200000, "totalDeductions": 110000, "netPay": 3190000 }
+  ],
+  "items": [
+    { "payItemId": 1, "itemName": "기본급", "category": "EARNING", "taxType": "TAXABLE", "amount": 6100000 },
+    { "payItemId": 4, "itemName": "식대", "category": "EARNING", "taxType": "NON_TAXABLE", "amount": 400000 },
+    { "payItemId": 6, "itemName": "소득세", "category": "DEDUCTION", "taxType": "NONE", "amount": 210000 }
+  ]
+}
+```
+
+- `months`: 확정 급여만, 월 순. 지급일(`paymentDate`)이 다음 해인 경우도 귀속 연도에 포함됩니다.
+- `items`: 항목별 연간 합계, 항목 표시 순서
+- `excludedDraftPayrollCount`: 이 사원의 작성 중 기간 급여 수(합산 제외)
+- 사원 정보는 그 해 마지막 확정 급여의 값이고, 확정 급여가 없으면 현재 사원 정보입니다.
+- 논리 삭제된 사원도 `200` + `deleted: true` (13번 API와 다름)
+- `404 EMPLOYEE_NOT_FOUND`: 없는 사원 ID
 
 ## 급여 오류 코드
 
