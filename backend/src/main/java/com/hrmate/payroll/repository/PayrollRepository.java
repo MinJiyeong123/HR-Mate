@@ -3,6 +3,7 @@ package com.hrmate.payroll.repository;
 import com.hrmate.payroll.domain.Payroll;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 /** 사원별 월 급여 조회·저장 (급여 항목은 Payroll 을 통해 함께 저장·삭제된다) */
 public interface PayrollRepository extends JpaRepository<Payroll, Long> {
@@ -18,4 +19,27 @@ public interface PayrollRepository extends JpaRepository<Payroll, Long> {
 
     /** 사원·연도별 급여 내역, 월 순 */
     List<Payroll> findAllByEmployee_IdAndPeriod_PayYearOrderByPeriod_PayMonthAsc(Long employeeId, int payYear);
+
+    /** 기간별 인원·합계 (목록 화면용, 한 번의 집계 조회) */
+    @Query("""
+            select p.period.id as periodId, count(p) as payrollCount,
+                   sum(p.totalEarnings) as totalEarnings, sum(p.totalDeductions) as totalDeductions,
+                   sum(p.netPay) as totalNetPay
+            from Payroll p
+            group by p.period.id
+            """)
+    List<PeriodTotals> summarizeByPeriod();
+
+    /** 기간별 집계 결과 */
+    interface PeriodTotals {
+        Long getPeriodId();
+
+        long getPayrollCount();
+
+        long getTotalEarnings();
+
+        long getTotalDeductions();
+
+        long getTotalNetPay();
+    }
 }
