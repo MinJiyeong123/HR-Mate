@@ -89,7 +89,7 @@ npm run dev
 시연용 가상 사원 12명(재직 10, 퇴사 2)을 개발 DB에 넣을 수 있습니다.
 
 - 파일: [docs/sample-data/sample-employees.sql](docs/sample-data/sample-employees.sql)
-- 넣는 방법과 시연 순서: [docs/demo-guide.md](docs/demo-guide.md)
+- 넣는 방법과 시연 순서: [docs/demo-guide.md](docs/demo-guide.md) (사원 관리 시연, 급여 관리 시연 시나리오와 주의사항 포함)
 - 모든 인물·연락처는 가상입니다. 이메일은 `example.com`만 사용하고 전화번호는 비워 둡니다.
 - 추가(INSERT)만 하며 여러 번 실행해도 중복되지 않습니다. 초기화는 필요 없습니다.
 - 한 번 넣은 데이터는 되돌리기 어려우니 내용을 확인한 뒤 실행하세요.
