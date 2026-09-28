@@ -82,7 +82,8 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      <p className="sidebar__footer">v0.1 · 1차 MVP</p>
+      {/* 진행 단계는 README에서 관리한다. 단계가 바뀌어도 고치지 않도록 고정 안내만 표시한다. */}
+      <p className="sidebar__footer">포트폴리오 데모 · 가상 데이터</p>
     </aside>
   )
 }
