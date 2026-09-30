@@ -36,7 +36,7 @@ const employeeNotFound = () => new ApiError(404, '사원 정보를 찾을 수 �
 const notEligible = (message = '해당 월에 재직한 사원만 급여를 입력할 수 있습니다.') => new ApiError(400, message, {})
 const linesError = (message) => invalidInput({ lines: message })
 
-const itemById = (id) => PAY_ITEMS.find((item) => item.id === id)
+export const itemById = (id) => PAY_ITEMS.find((item) => item.id === id)
 
 function isRealDate(value) {
   if (!DATE_PATTERN.test(value)) return false
@@ -61,8 +61,8 @@ function parseId(raw) {
 
 // ---------- 계산 ----------
 
-/** 급여 한 건의 합계 (0원 항목은 저장하지 않으므로 모든 항목이 대상) */
-function totalsOf(payroll) {
+/** 급여 한 건의 합계 (0원 항목은 저장하지 않으므로 모든 항목이 대상). 연간 집계(payrollSummary.js)도 사용 */
+export function totalsOf(payroll) {
   let earnings = 0
   let deductions = 0
   for (const line of payroll.lines) {
@@ -73,7 +73,7 @@ function totalsOf(payroll) {
   return { totalEarnings: earnings, totalDeductions: deductions, netPay: earnings - deductions }
 }
 
-const byEmployeeNo = (a, b) => (a.employeeNo < b.employeeNo ? -1 : a.employeeNo > b.employeeNo ? 1 : 0)
+export const byEmployeeNo = (a, b) => (a.employeeNo < b.employeeNo ? -1 : a.employeeNo > b.employeeNo ? 1 : 0)
 const payrollsOf = (state, periodId) => state.payrolls.filter((p) => p.periodId === periodId).sort(byEmployeeNo)
 
 function periodSummary(period, payrolls) {

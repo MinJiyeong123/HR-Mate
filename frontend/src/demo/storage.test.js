@@ -138,6 +138,7 @@ test('변경 결과가 형식에 맞지 않으면 저장하지 않는다', () =>
   const store = createDemoStore({ storage })
   store.load()
   assert.throws(() => store.update((state) => { delete state.payrolls }), DemoStorageError)
-  assert.equal(store.getState().payrolls.length, 3)
-  assert.equal(saved(storage).payrolls.length, 3)
+  const count = createSeedData().payrolls.length
+  assert.equal(store.getState().payrolls.length, count)
+  assert.equal(saved(storage).payrolls.length, count)
 })

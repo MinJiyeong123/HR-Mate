@@ -57,6 +57,64 @@ function payroll(id, periodId, emp, lines) {
 
 const line = (payItemId, amount) => ({ payItemId, amount })
 
+// 2026년 1~8월 확정 급여를 만들 때 쓰는 사원별 월 금액 (모두 직접 정한 시뮬레이션 값, 법정 계산 아님)
+// [사원 id, 기본급, 소득세, 국민연금, 건강보험, 장기요양보험, 고용보험, 7월 상여금에 더하는 소득세]
+// 식대는 모두 월 20만원(비과세), 지방소득세는 소득세의 10%, 7월에는 기본급의 50% 를 상여금으로 준다.
+const MONTHLY_PAY = [
+  [1, 3_000_000, 100_000, 135_000, 100_000, 5_000, 20_000, 120_000],
+  [2, 3_600_000, 180_000, 162_000, 75_000, 5_000, 20_000, 200_000],
+  [3, 2_700_000, 70_000, 121_500, 95_700, 4_800, 20_000, 80_000],
+  [4, 3_200_000, 60_000, 144_000, 113_400, 14_680, 28_800, 90_000],
+  [5, 2_600_000, 20_000, 117_000, 92_100, 11_920, 23_400, 40_000],
+  [6, 4_000_000, 250_000, 180_000, 141_800, 18_360, 36_000, 0], // 2026-06-30 퇴사 → 1~6월만
+  [7, 2_800_000, 40_000, 126_000, 99_260, 12_850, 25_200, 50_000],
+  [8, 2_500_000, 20_000, 112_500, 88_620, 11_470, 22_500, 30_000],
+]
+const CONFIRMED_MONTHS = [1, 2, 3, 4, 5, 6, 7, 8]
+const BONUS_MONTH = 7
+
+const pad2 = (n) => String(n).padStart(2, '0')
+
+/** 확정된 2026년 1~8월 급여 기간 (id 2~9). 지급일은 매월 25일, 확정 시각은 그 전날 오후 */
+function confirmedPeriods() {
+  return CONFIRMED_MONTHS.map((month, index) => ({
+    id: index + 2,
+    year: 2026,
+    month,
+    paymentDate: `2026-${pad2(month)}-25`,
+    status: 'CONFIRMED',
+    confirmedAt: `2026-${pad2(month)}-24T17:00:00.000`,
+  }))
+}
+
+/** 확정 기간의 급여: 기간(월) 순, 같은 달은 사번 순으로 id 4 부터. 그 달 퇴사일 이후 사원은 제외 */
+function confirmedPayrolls(employees, periods) {
+  const payrolls = []
+  let id = 4
+  for (const period of periods) {
+    const lastDay = `2026-${pad2(period.month)}-31`
+    for (const [employeeId, base, incomeTax, pension, health, longTermCare, employment, bonusTax] of MONTHLY_PAY) {
+      const emp = employees.find((e) => e.id === employeeId)
+      if (emp.resignationDate !== null && emp.resignationDate < `2026-${pad2(period.month)}-01`) continue
+      if (emp.hireDate > lastDay) continue
+      const bonusMonth = period.month === BONUS_MONTH
+      const tax = incomeTax + (bonusMonth ? bonusTax : 0)
+      payrolls.push(payroll(id++, period.id, emp, [
+        line(1, base),
+        ...(bonusMonth ? [line(3, base / 2)] : []),
+        line(4, 200_000),
+        line(6, tax),
+        line(7, tax / 10),
+        line(8, pension),
+        line(9, health),
+        line(10, longTermCare),
+        line(11, employment),
+      ]))
+    }
+  }
+  return payrolls
+}
+
 export function createSeedData() {
   const employees = [
     employee(1, '가상일', '인사팀', '대리', '2021-03-02'),
@@ -68,20 +126,43 @@ export function createSeedData() {
     employee(7, '가상칠', '마케팅팀', '사원', '2023-04-03'),
     employee(8, '가상팔', '인사팀', '사원', '2025-08-01'),
   ]
+  // 2026년 9월(id 1, 작성 중)은 D1 부터 있던 기간이다. 연간 집계·연말정산에는 확정된 1~8월(id 2~9)만 합산된다.
+  const periods = confirmedPeriods()
   const payrollPeriods = [
     { id: 1, year: 2026, month: 9, paymentDate: '2026-09-25', status: 'DRAFT', confirmedAt: null },
+    ...periods,
   ]
   const payrolls = [
     payroll(1, 1, employees[0], [line(1, 3_000_000), line(4, 200_000), line(6, 100_000), line(7, 10_000), line(8, 135_000), line(9, 100_000), line(10, 5_000), line(11, 20_000)]),
     payroll(2, 1, employees[1], [line(1, 3_600_000), line(4, 200_000), line(6, 180_000), line(7, 18_000), line(8, 162_000), line(9, 75_000), line(10, 5_000), line(11, 20_000)]),
     payroll(3, 1, employees[2], [line(1, 2_700_000), line(4, 200_000), line(6, 70_000), line(7, 7_000), line(8, 121_500), line(9, 95_700), line(10, 4_800), line(11, 20_000)]),
+    ...confirmedPayrolls(employees, periods),
+  ]
+  // 연말정산 입력 자료 예시 1건 (가상): DEMO002 2026년 귀속 — 배우자 기본공제, 부양가족 1명(자녀세액공제 대상 1명).
+  // 나머지 사원은 입력 자료가 없어 "본인 기본공제만" 으로 계산된다.
+  const yearEndInputs = [
+    {
+      employeeId: 2,
+      taxYear: 2026,
+      spouseDeduction: true,
+      dependentCount: 1,
+      elderlyCount: 0,
+      disabledCount: 0,
+      womanDeduction: false,
+      singleParentDeduction: false,
+      childCreditCount: 1,
+      birthFirstCount: 0,
+      birthSecondCount: 0,
+      birthThirdPlusCount: 0,
+      updatedAt: '2026-09-01T09:00:00.000',
+    },
   ]
   return {
     schemaVersion: SCHEMA_VERSION,
-    nextIds: { employee: 9, payrollPeriod: 2, payroll: 4 },
+    nextIds: { employee: 9, payrollPeriod: 10, payroll: payrolls.length + 1 },
     employees,
     payrollPeriods,
     payrolls,
-    yearEndInputs: [],
+    yearEndInputs,
   }
 }

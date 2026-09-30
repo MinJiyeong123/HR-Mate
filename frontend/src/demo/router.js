@@ -1,12 +1,16 @@
 // ------------------------------------------------------------------
 // 체험 모드 가짜 서버: 요청 주소·방식을 보고 처리 함수를 찾는다 (네트워크 요청 없음)
 // - D1-4: 사원(/api/employees), 급여 항목·기간·급여(/api/pay-items, /api/payroll-periods, /api/payrolls) 를 처리.
-//   연간 집계(/api/payroll-summaries), 사원별 연간 내역, 연말정산 등 나머지는 "준비 중"(501).
+// - D2-2: 연간 급여 집계(/api/payroll-summaries/annual...) 를 처리.
+// - D2-4: 연말정산(/api/year-end/{year}/employees...) 을 처리. 계산은 yearend/ 계산기가 한다.
+//   사원별 연간 내역(/api/employees/{id}/payrolls, 화면 미사용) 등 나머지는 "준비 중"(501).
 // - 응답은 복사본으로 돌려준다(화면이 값을 바꿔도 저장소에 영향 없음).
 // ------------------------------------------------------------------
 import { ApiError, notReady } from './errors.js'
 import { handleEmployees } from './handlers/employees.js'
 import { handlePayItems, handlePayrollPeriods, handlePayrolls } from './handlers/payroll.js'
+import { handlePayrollSummaries } from './handlers/payrollSummary.js'
+import { handleYearEnd } from './handlers/yearend.js'
 import { DemoStorageError } from './storage.js'
 
 const HANDLERS = {
@@ -14,6 +18,8 @@ const HANDLERS = {
   'pay-items': handlePayItems,
   'payroll-periods': handlePayrollPeriods,
   payrolls: handlePayrolls,
+  'payroll-summaries': handlePayrollSummaries,
+  'year-end': handleYearEnd,
 }
 
 const clone = (value) => (value === null || value === undefined ? null : JSON.parse(JSON.stringify(value)))

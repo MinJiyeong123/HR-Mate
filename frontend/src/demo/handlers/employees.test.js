@@ -188,12 +188,12 @@ test('응답은 복사본: 받은 값을 바꿔도 저장소는 바뀌지 않는
   assert.equal(call('/api/employees/1').name, '가상일')
 })
 
-test('지원하지 않는 방식 405, 없는 사원 경로 404, 연간 집계·사원별 연간 내역·연말정산은 준비 중 501', () => {
+test('지원하지 않는 방식 405, 없는 사원 경로 404, 사원별 연간 내역(화면 미사용)은 준비 중 501', () => {
   const { call } = setup()
   expectError(() => call('/api/employees', { method: 'DELETE' }), 405)
   expectError(() => call('/api/employees/1/unknown'), 404)
   const notReady = { message: '체험 모드에서 아직 준비 중인 기능입니다.' }
-  for (const path of ['/api/employees/1/payrolls?year=2026', '/api/payroll-summaries/annual?year=2026', '/api/payroll-summaries/annual/employees/1?year=2026', '/api/year-end/2026/employees']) {
+  for (const path of ['/api/employees/1/payrolls?year=2026']) {
     expectError(() => call(path), 501, notReady)
   }
 })
