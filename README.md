@@ -147,7 +147,7 @@ npm run dev
 | `npm run preview:demo` | `build:demo` 결과를 미리보기 (보통 http://localhost:4173) |
 
 - 주소는 `#`이 붙는 방식입니다. 예: `http://localhost:4173/#/employees`. 서버 설정 없이 정적 파일만으로 새로고침해도 화면을 찾기 위해서입니다. (일반 모드는 기존대로 `#` 없는 주소)
-- 체험 모드 빌드는 상대 경로로 파일을 불러오므로 하위 주소(예: `/HR-Mate/`)에 올려도 동작합니다. 어디에 공개할지는 아직 정하지 않았습니다.
+- 체험 모드 빌드는 상대 경로로 파일을 불러오므로 하위 주소(예: `/HR-Mate/`)에 올려도 동작합니다. 공개 배포 방법은 아래 "공개 배포 (Cloudflare Pages)"를 참고하세요.
 
 ### 데이터 저장과 초기화
 
@@ -177,9 +177,30 @@ npm run dev
 
 - `build:demo` 결과의 `index.html`에는 **콘텐츠 보안 정책(CSP)**이 들어 있습니다. 브라우저에게 "이 사이트의 파일만 실행하고, 어떤 서버로도 연결하지 말라"고 알려 주는 규칙입니다.
 - 핵심은 `connect-src 'none'`입니다. fetch·XHR·WebSocket 같은 네트워크 연결이 모두 막히므로 코드에 실수가 있어도 입력 내용이 밖으로 나갈 수 없습니다.
-- `<meta>` 태그 방식이라 서버 설정 없이 어느 정적 호스팅에서도 적용됩니다. 다만 다른 사이트가 이 화면을 틀(iframe)에 넣지 못하게 하는 `frame-ancestors` 같은 일부 규칙은 `<meta>`로 적용되지 않아, 필요하면 호스팅을 정한 뒤 서버 응답 헤더로 따로 설정해야 합니다.
+- `<meta>` 태그 방식이라 서버 설정 없이 어느 정적 호스팅에서도 적용됩니다. 다만 다른 사이트가 이 화면을 틀(iframe)에 넣지 못하게 하는 `frame-ancestors` 같은 일부 규칙은 `<meta>`로 적용되지 않습니다. 이런 규칙은 서버 응답 헤더로만 설정할 수 있으며(Cloudflare Pages는 `_headers` 파일), 현재는 설정하지 않았습니다.
 - 개발 서버(`dev:demo`)에는 CSP를 넣지 않습니다. 개발 서버는 코드 변경을 화면에 바로 반영하려고 WebSocket 연결을 쓰기 때문입니다.
 - 일반 모드 빌드(`npm run build`)에는 CSP와 체험 모드 코드가 들어가지 않습니다.
+
+### 공개 배포 (Cloudflare Pages)
+
+체험 모드 빌드(`dist-demo/`)는 정적 파일만으로 동작하므로 Cloudflare Pages에 올려 공개합니다. 방문자는 브라우저만 있으면 되고, 백엔드·DB는 배포하지 않습니다. 저장소는 비공개(Private)로 둔 채 GitHub 연결로 자동 배포합니다.
+
+Cloudflare Pages 프로젝트의 빌드 설정(대시보드에서 입력):
+
+| 설정 | 값 |
+|---|---|
+| Production branch | `main` |
+| Root directory | `frontend` |
+| Build command | `npm run build:demo` |
+| Build output directory | `dist-demo` (Root directory 기준) |
+| Node.js 버전 | `frontend/.nvmrc`의 `24` (빌드 환경 기본값 대신 이 파일의 버전을 씁니다) |
+| Build watch paths (선택) | Include `frontend/*` — 백엔드·문서만 바뀐 push 에는 다시 배포하지 않습니다 |
+
+- 라이브러리 설치(`frontend/package-lock.json` 기준)는 Cloudflare 빌드 환경이 빌드 명령 전에 자동으로 합니다(끄는 옵션 `SKIP_DEPENDENCY_INSTALL`이 따로 있는 기본 동작). 그래서 빌드 명령에는 체험 모드 빌드만 적습니다.
+- 첫 배포 후 빌드 로그에서 ① 라이브러리 설치가 실행됐는지 ② Node.js 24가 쓰였는지 확인합니다. Node 버전이 다르면 프로젝트 환경 변수 `NODE_VERSION`을 `24`로 지정합니다.
+- 공개 주소는 `https://<프로젝트명>.pages.dev` 형태이며, 주소 뒤에 `#/employees`처럼 `#` 주소가 붙습니다.
+- Cloudflare의 분석 스크립트 자동 삽입(Web Analytics 등)은 켜지 않습니다. 켜면 위 CSP가 외부 스크립트를 막아 콘솔에 오류가 납니다.
+- `main` 외 브랜치는 미리보기 주소로 배포됩니다. 체험 모드는 가상 데이터만 쓰므로 공개되어도 무방하지만, 실제 개인정보를 넣은 브랜치를 올리지 않습니다.
 
 ## 데모 데이터와 시연
 
